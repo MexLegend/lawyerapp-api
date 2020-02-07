@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const web_push_1 = require("web-push");
 const notificationMdl_1 = __importDefault(require("../models/notificationMdl"));
 const express_1 = require("express");
-web_push_1.setVapidDetails('mailto:example@yourdomain.com', "BFzRa32U-hCa5uiD2nHyiJx_OBHj3v2q9C_-sjyA_xMy2N6E62Uw8GFfGzMa5bQOgxGceTgajzejbTExleHbMXM", "tN0H3R3AwtP0DBTKvcdoZCmzSKCnPZzIJEt-bHF9bOo");
+web_push_1.setVapidDetails('mailto:example@yourdomain.com', process.env.WEBPUSHPUBLICKEY, process.env.WEBPUSHPRIVATEKEY);
 exports.desconectar = (cliente) => {
     cliente.on('disconnect', () => {
         console.log('Cliente desconectado');

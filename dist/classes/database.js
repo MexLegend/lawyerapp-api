@@ -10,7 +10,7 @@ class Database {
         return this._instance || (this._instance = new this());
     }
     start() {
-        const db = 'mongodb+srv://devex:ML03ERn9pgvueKPa@cluster0-vi3ri.mongodb.net/lawyerapp';
+        const db = process.env.DB;
         mongoose_1.default.Promise = global.Promise;
         mongoose_1.default.set('useCreateIndex', true);
         mongoose_1.default

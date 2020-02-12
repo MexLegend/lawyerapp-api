@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = require("jsonwebtoken");
-const secret = process.env.SECRET;
 exports.AUTH = {
     verifyToken(req, res, next) {
         let token = req.get('token');
-        jsonwebtoken_1.verify(token, process.env.SECRET, (err, decoded) => {
+        let SECRET = process.env.SECRET;
+        jsonwebtoken_1.verify(token, SECRET, (err, decoded) => {
             if (err) {
                 return res.status(401).json({
                     err,
@@ -45,7 +45,8 @@ exports.AUTH = {
     },
     verifyTokenImg(req, res, next) {
         let token = req.query.token;
-        jsonwebtoken_1.verify(token, process.env.SECRET, (err, decoded) => {
+        let SECRET = process.env.SECRET;
+        jsonwebtoken_1.verify(token, SECRET, (err, decoded) => {
             if (err) {
                 return res.status(401).json({
                     err,

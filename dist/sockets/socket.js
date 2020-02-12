@@ -15,16 +15,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const web_push_1 = require("web-push");
 const notificationMdl_1 = __importDefault(require("../models/notificationMdl"));
 const express_1 = require("express");
-web_push_1.setVapidDetails('mailto:example@yourdomain.com', process.env.WEBPUSHPUBLICKEY, process.env.WEBPUSHPRIVATEKEY);
 exports.desconectar = (cliente) => {
     cliente.on('disconnect', () => {
         console.log('Cliente desconectado');
     });
 };
+const getNoti = (notification) => __awaiter(void 0, void 0, void 0, function* () {
+    yield notificationMdl_1.default.create(notification);
+    const notifi = yield notificationMdl_1.default.find();
+    return notifi;
+});
 exports.notificacion = (cliente, io) => {
-    cliente.on('notification', (payload, body) => __awaiter(void 0, void 0, void 0, function* () {
+    cliente.on('notification', (payload) => __awaiter(void 0, void 0, void 0, function* () {
         console.log('Notification Received!!', payload);
-        // console.log('New client ogggggggggggg', cliente)
+        let WEBPUSHPRIVATEKEY = process.env.WEBPUSHPRIVATEKEY;
+        let WEBPUSHPUBLICKEY = process.env.WEBPUSHPUBLICKEY;
+        web_push_1.setVapidDetails('mailto:example@yourdomain.com', WEBPUSHPUBLICKEY, WEBPUSHPRIVATEKEY);
         let pay = JSON.stringify({
             "notification": {
                 "title": "Pino Y Roble - Abogados",
@@ -43,6 +49,7 @@ exports.notificacion = (cliente, io) => {
             title: noti.title,
             typeU: payload.typeU
         });
+        // getNoti(notiN)
         yield notificationMdl_1.default.create(notiN);
         const notifi = yield notificationMdl_1.default.find();
         for (const key in notifi) {
@@ -50,9 +57,7 @@ exports.notificacion = (cliente, io) => {
             if (value.view === false && value.typeU !== payload.typeU && value.typeU !== undefined) {
                 // console.log("Notify Role: " + value.typeU + "Request Role: " + req.user.role)
                 Promise.resolve(web_push_1.sendNotification(payload.sub, pay))
-                    .then(() => express_1.response.status(200).json({
-                    message: 'Notification sent'
-                }))
+                    .then()
                     .catch(err => {
                     console.log(err);
                     express_1.response.sendStatus(500);

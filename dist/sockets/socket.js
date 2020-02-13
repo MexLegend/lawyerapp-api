@@ -30,32 +30,45 @@ exports.notificacion = (cliente, io) => {
         console.log('Notification Received!!', payload);
         let WEBPUSHPRIVATEKEY = process.env.WEBPUSHPRIVATEKEY;
         let WEBPUSHPUBLICKEY = process.env.WEBPUSHPUBLICKEY;
+        let notifi;
+        let pay;
+        let typeU = (payload.typeU !== '' ? payload.typeU : 'ADMIN');
         web_push_1.setVapidDetails('mailto:example@yourdomain.com', WEBPUSHPUBLICKEY, WEBPUSHPRIVATEKEY);
-        let pay = JSON.stringify({
-            "notification": {
-                "title": "Pino Y Roble - Abogados",
-                "body": `${payload.name} actualizo su información general`,
-                "icon": ""
-            }
-        });
-        let noti = {
-            body: 'Gracias por subscribirte!',
-            icon: '',
-            title: 'Lawyerapp'
-        };
-        const notiN = new notificationMdl_1.default({
-            body: noti.body,
-            icon: noti.icon,
-            title: noti.title,
-            typeU: payload.typeU
-        });
-        // getNoti(notiN)
-        yield notificationMdl_1.default.create(notiN);
-        const notifi = yield notificationMdl_1.default.find();
+        if (payload.action === 'write') {
+            let noti = {
+                body: 'Gracias por subscribirte!',
+                icon: '',
+                title: 'Lawyerapp'
+            };
+            pay = JSON.stringify({
+                "notification": {
+                    "title": "Pino Y Roble - Abogados",
+                    "body": `${payload.name} actualizo su información general`,
+                    "icon": ""
+                }
+            });
+            const notiN = new notificationMdl_1.default({
+                body: noti.body,
+                icon: noti.icon,
+                title: noti.title,
+                typeU
+            });
+            // getNoti(notiN)
+            yield notificationMdl_1.default.create(notiN);
+            notifi = yield notificationMdl_1.default.find();
+        }
         for (const key in notifi) {
             const value = notifi[key];
-            if (value.view === false && value.typeU !== payload.typeU && value.typeU !== undefined) {
-                // console.log("Notify Role: " + value.typeU + "Request Role: " + req.user.role)
+            if (value.view === false && value.typeU !== typeU && value.typeU !== undefined) {
+                if (typeU === 'ADMIN') {
+                    pay = JSON.stringify({
+                        "notification": {
+                            "title": `${value.title}`,
+                            "body": `${value.body}`,
+                            "icon": `${value.icon}`
+                        }
+                    });
+                }
                 Promise.resolve(web_push_1.sendNotification(payload.sub, pay))
                     .then()
                     .catch(err => {

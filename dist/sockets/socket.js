@@ -20,11 +20,6 @@ exports.desconectar = (cliente) => {
         console.log('Cliente desconectado');
     });
 };
-const getNoti = (notification) => __awaiter(void 0, void 0, void 0, function* () {
-    yield notificationMdl_1.default.create(notification);
-    const notifi = yield notificationMdl_1.default.find();
-    return notifi;
-});
 exports.notificacion = (cliente, io) => {
     cliente.on('notification', (payload) => __awaiter(void 0, void 0, void 0, function* () {
         console.log('Notification Received!!', payload);

@@ -27,7 +27,6 @@ class UserController {
                     lastName,
                     password: bcryptjs_1.hashSync(password, 10)
                 });
-                // return console.log(userN)
                 const user = yield userMdl_1.default.create(userN);
                 res.status(201).json({ ok: true, user, message: 'Usuario creado correctamente' });
             }

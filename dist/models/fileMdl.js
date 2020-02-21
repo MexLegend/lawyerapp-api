@@ -7,22 +7,36 @@ const mongoose_1 = require("mongoose");
 const mongoose_paginate_1 = __importDefault(require("mongoose-paginate"));
 const SchemaM = mongoose_1.Schema;
 const fileModel = new SchemaM({
+    actor: {
+        type: String,
+        required: [true, 'El Actor es requerido']
+    },
     affair: {
         type: String,
         required: [true, 'El Asunto es requerido']
     },
     assigned_client: {
-        type: String,
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'User',
         required: [true, 'El Cliente es requerido']
+    },
+    defendant: {
+        type: String,
+        required: [true, 'El Demandante es requerido']
     },
     description: {
         type: String,
         required: [true, 'La Descripcion es requerida']
     },
-    end_date: {
-        type: Date
+    intKey: {
+        type: String,
+        required: [true, 'La Clave Interna es requerida']
     },
-    key: {
+    third: {
+        type: String,
+        required: [true, 'Los Terceros son requeridos']
+    },
+    extKey: {
         type: String
     },
     start_date: {

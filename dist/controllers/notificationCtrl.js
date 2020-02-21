@@ -13,81 +13,61 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const notificationMdl_1 = __importDefault(require("../models/notificationMdl"));
-const web_push_1 = require("web-push");
 class NotificationController {
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let WEBPUSHPRIVATEKEY = process.env.WEBPUSHPRIVATEKEY;
-            let WEBPUSHPUBLICKEY = process.env.WEBPUSHPUBLICKEY;
-            let notifi;
-            let pay;
-            const { action, name, sub, typeU } = req.body;
-            // return console.log('Create Notification: ', req.body)
-            // let typeU = (req.typeU !== '' ? req.typeU : 'ADMIN')
-            web_push_1.setVapidDetails('mailto:example@yourdomain.com', WEBPUSHPUBLICKEY, WEBPUSHPRIVATEKEY);
-            let noti = {
-                body: 'Gracias por subscribirte!',
-                icon: '',
-                title: 'Lawyerapp'
-            };
-            pay = JSON.stringify({
-                "notification": {
-                    "title": "Pino Y Roble - Abogados",
-                    "body": `${name} actualizo su información general`,
-                    "icon": ""
-                }
-            });
-            const notiN = new notificationMdl_1.default({
-                body: noti.body,
-                icon: noti.icon,
-                title: noti.title,
-                typeU
-            });
-            yield notificationMdl_1.default.create(notiN);
-            // notifi = await Notification.find();
+            console.log('post notification sendddddddddddddddddd');
+            // console.log(req.get('typeU'))
+            // const subscription = req.body;
+            // res.set('Content-Type', 'application/json');
+            // const name = req.get('name');
+            // const typeU = req.get('typeU');
+            // setVapidDetails(
+            //   'mailto:example@yourdomain.com',
+            //   "BFzRa32U-hCa5uiD2nHyiJx_OBHj3v2q9C_-sjyA_xMy2N6E62Uw8GFfGzMa5bQOgxGceTgajzejbTExleHbMXM",
+            //   "tN0H3R3AwtP0DBTKvcdoZCmzSKCnPZzIJEt-bHF9bOo"
+            // );
+            // let payload = JSON.stringify({
+            //   "notification": {
+            //     "title": "Pino Y Roble - Abogados",
+            //     "body": `${name} actualizo su información general`,
+            //     "icon": ""
+            //   }
+            // });
+            // let noti = {
+            //   body: 'Gracias por subscribirte!',
+            //   icon: '',
+            //   title: 'Lawyerapp'
+            // }
+            // const notiN = new Notification({
+            //   body: noti.body,
+            //   icon: noti.icon,
+            //   title: noti.title,
+            //   typeU
+            // });
+            // await Notification.create(notiN);
+            // const notifi = await Notification.find();
             // for (const key in notifi) {
             //   const value: any = notifi[key];
-            //   if (value.view === false && value.typeU !== typeU && value.typeU !== undefined) {
-            //     Promise.resolve(sendNotification(sub, pay))
-            //       .then()
+            //   if (value.view === false && value.typeU !== req.user.role && value.typeU !== undefined) {
+            //     // console.log("Notify Role: " + value.typeU + "Request Role: " + req.user.role)
+            //     Promise.resolve(sendNotification(subscription, payload))
+            //       .then(() =>
+            //         res.status(200).json({
+            //           message: 'Notification sent'
+            //         })
+            //       )
             //       .catch(err => {
             //         console.log(err);
             //         res.sendStatus(500);
             //       })
             //   }
             // }
-        });
-    }
-    send(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let WEBPUSHPRIVATEKEY = process.env.WEBPUSHPRIVATEKEY;
-            let WEBPUSHPUBLICKEY = process.env.WEBPUSHPUBLICKEY;
-            let notifi;
-            let pay;
-            const { action, name, sub, typeU } = req.body;
-            // return console.log('Create Notification: ', req.body)
-            // let typeU = (req.typeU !== '' ? req.typeU : 'ADMIN')
-            web_push_1.setVapidDetails('mailto:example@yourdomain.com', WEBPUSHPUBLICKEY, WEBPUSHPRIVATEKEY);
-            notifi = yield notificationMdl_1.default.find();
-            for (const key in notifi) {
-                const value = notifi[key];
-                if (value.view === false && value.typeU !== typeU && value.typeU !== undefined) {
-                    console.log(action);
-                    pay = JSON.stringify({
-                        "notification": {
-                            "title": value.title,
-                            "body": value.body,
-                            "icon": ""
-                        }
-                    });
-                    Promise.resolve(web_push_1.sendNotification(sub, pay))
-                        .then()
-                        .catch(err => {
-                        console.log(err);
-                        res.sendStatus(500);
-                    });
-                }
-            }
+            res.status(200).json({
+                message: 'Notification sent'
+            });
+            // res.status(201).json({})
+            // const payload = JSON.stringify({ title : 'Push test' })
         });
     }
     delete(req, res) {

@@ -18,12 +18,17 @@ class FileController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const body = req.body;
-                console.log(body);
+                // console.log(body)
+                // return;
                 const fileN = new fileMdl_1.default({
+                    actor: body.actor,
                     affair: body.affair,
                     assigned_client: body.assigned_client,
+                    defendant: body.defendant,
                     description: body.description,
-                    key: body.key,
+                    intKey: body.intKey,
+                    third: body.third,
+                    extKey: body.extKey,
                     user: req.user._id
                 });
                 const file = yield fileMdl_1.default.create(fileN);
@@ -77,6 +82,11 @@ class FileController {
                 const options = {
                     page: parseInt(page, 10),
                     limit: parseInt(perPage, 10),
+                    populate: [
+                        {
+                            path: 'assigned_client'
+                        }
+                    ],
                     sort: {
                         title: 1
                     }
@@ -89,6 +99,11 @@ class FileController {
                         },
                         {
                             status
+                        },
+                    ],
+                    $or: [
+                        {
+                            user: req.user._id
                         },
                         {
                             assigned_client: req.user._id
@@ -115,7 +130,7 @@ class FileController {
     getOne(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const file = yield fileMdl_1.default.findOne({ _id: req.params.id });
+                const file = yield fileMdl_1.default.findOne({ _id: req.params.id }).populate('assigned_client');
                 res.status(200).json({ ok: true, file });
             }
             catch (err) {

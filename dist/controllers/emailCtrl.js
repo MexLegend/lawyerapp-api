@@ -17,19 +17,19 @@ class EmailController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 // return console.log(req.body)
-                const { name, email, phone, city, message } = req.body;
+                const { nameContacto, emailContacto, phoneContacto, cityContacto, messageContacto } = req.body;
                 const contentHTML = `
                 <h1>Informacion de Usuario</h1>
                 <ul>
-                    <li>Nombre y Apellidos: ${name}</li>
-                    <li>Email: ${email}</li>
-                    <li>Telefono: ${phone}</li>
-                    <li>Ciudad: ${city}</li>
+                    <li>Nombre y Apellidos: ${nameContacto}</li>
+                    <li>Contacto: ${emailContacto}</li>
+                    <li>Telefono: ${phoneContacto}</li>
+                    <li>Ciudad: ${cityContacto}</li>
                 </ul>
-                <p>${message}</p>
+                <p>${messageContacto}</p>
             `;
                 const data = {
-                    from: email,
+                    from: emailContacto,
                     to: 'turbinarest@gmail.com',
                     subject: 'Formulario de Contacto',
                     html: contentHTML
@@ -48,7 +48,7 @@ class EmailController {
                 //     user: req.user._id
                 // });
                 // const post = await Post.create(postN);
-                return res.status(201).json({ ok: true, name, message, email });
+                return res.status(201).json({ ok: true, nameContacto, messageContacto, emailContacto });
             }
             catch (err) {
                 res.status(500).json({ err, ok: false });

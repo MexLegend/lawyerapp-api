@@ -25,16 +25,14 @@ const fileModel = new SchemaM({
         required: [true, 'El Demandante es requerido']
     },
     description: {
-        type: String,
-        required: [true, 'La Descripcion es requerida']
+        type: String
     },
     intKey: {
         type: String,
         required: [true, 'La Clave Interna es requerida']
     },
     third: {
-        type: String,
-        required: [true, 'Los Terceros son requeridos']
+        type: String
     },
     extKey: {
         type: String

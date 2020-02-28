@@ -13,6 +13,7 @@ class UserRoutes {
     }
     config() {
         this.router.post('/', userCtrl_1.default.create);
+        this.router.post('/check/email', userCtrl_1.default.checkEmail);
         this.router.get('/', [authentication_1.AUTH.verifyToken, authentication_1.AUTH.verifyAdmin], userCtrl_1.default.get);
         this.router.get('/:id', [authentication_1.AUTH.verifyToken, authentication_1.AUTH.verifyAdmin], userCtrl_1.default.getOne);
         this.router.put('/:id', [authentication_1.AUTH.verifyToken, authentication_1.AUTH.verifyAdminSameUser], userCtrl_1.default.update);

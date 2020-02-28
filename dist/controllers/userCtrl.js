@@ -15,6 +15,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const bcryptjs_1 = require("bcryptjs");
 const userMdl_1 = __importDefault(require("../models/userMdl"));
 class UserController {
+    checkEmail(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                // console.log('Bodyyyy')
+                // console.log(req.body);
+                // res.json({ message: 'req.bodyyyyy'})
+                // return;
+                const { email } = req.body;
+                const user = yield userMdl_1.default.findOne({ email });
+                if (user !== null) {
+                    return res.json({ ok: true, exist: true, message: 'El email ya esta en uso', user });
+                }
+                else {
+                    return res.json({ ok: true, exist: false });
+                }
+            }
+            catch (err) {
+                res.status(500).json({ err, ok: false, message: 'Error al encontrar usuario' });
+            }
+        });
+    }
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -31,7 +52,7 @@ class UserController {
                 res.status(201).json({ ok: true, user, message: 'Usuario creado correctamente' });
             }
             catch (err) {
-                res.status(500).json({ err, ok: false, meesage: 'Error al crear el usuario' });
+                res.status(500).json({ err, ok: false, message: 'Error al crear el usuario' });
             }
         });
     }

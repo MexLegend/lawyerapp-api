@@ -7,9 +7,6 @@ const mongoose_1 = require("mongoose");
 const mongoose_paginate_1 = __importDefault(require("mongoose-paginate"));
 const SchemaM = mongoose_1.Schema;
 const postModel = new SchemaM({
-    author: {
-        type: String
-    },
     content: {
         type: String,
         required: [true, 'El Contenido es requerido']
@@ -18,7 +15,14 @@ const postModel = new SchemaM({
         type: Date,
         default: Date.now
     },
+    external_sources: {
+        type: String
+    },
     img: {
+        type: String,
+        required: false
+    },
+    public_id: {
         type: String,
         required: false
     },

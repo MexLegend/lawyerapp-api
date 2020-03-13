@@ -1,10 +1,9 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -18,7 +17,7 @@ class FileController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const body = req.body;
-                // console.log(body)
+                console.log(body);
                 // return;
                 const fileN = new fileMdl_1.default({
                     actor: body.actor,
@@ -26,23 +25,30 @@ class FileController {
                     assigned_client: body.assigned_client,
                     defendant: body.defendant,
                     description: body.description,
-                    intKey: body.intKey,
+                    intKeys: [{
+                            intKey: body.intKeys.intKey,
+                            num: body.intKeys.num
+                        }],
                     third: body.third,
                     extKey: body.extKey,
-                    user: req.user._id
+                    user: req.user._id,
+                    volumes: [{
+                            num: body.intKeys.num,
+                            volume: 'T1/04/03/2020'
+                        }]
                 });
                 const file = yield fileMdl_1.default.create(fileN);
-                res.status(201).json({ ok: true, file });
+                res.status(201).json({ file, ok: true, message: 'Expediente creado correctamente' });
             }
             catch (err) {
-                res.status(500).json({ err, ok: false });
+                res.status(500).json({ err, message: 'Error al crear el Expediente', ok: false });
             }
         });
     }
     delete(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
             try {
+                const { id } = req.params;
                 const changeStatus = {
                     status: false
                 };
@@ -51,20 +57,20 @@ class FileController {
                 });
                 if (!file) {
                     return res.status(404).json({
-                        message: `No se encontro al file con id: ${id}`,
+                        message: 'No se encontro el Expediente',
                         ok: false
                     });
                 }
                 return res.json({
-                    message: `File ${file.affair} borrado`,
-                    ok: true,
-                    file
+                    file,
+                    message: `Expediente ${file.affair} borrado`,
+                    ok: true
                 });
             }
             catch (err) {
                 res.status(500).json({
                     err,
-                    message: `No se encontro al file con id: ${id}`,
+                    message: 'No se encontro el Expediente',
                     ok: false
                 });
             }
@@ -72,13 +78,19 @@ class FileController {
     }
     getAll(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            return console.log(req.body);
+            try {
+                const files = yield fileMdl_1.default.find().populate('assigned_client');
+                res.status(200).json({ files, ok: true });
+            }
+            catch (err) {
+                res.status(500).json({ err, ok: false });
+            }
         });
     }
     get(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { page = 1, perPage = 10, filter, orderField, orderType, filterOpt = 'affair', status } = req.query;
+                const { filter, filterOpt = 'affair', page = 1, perPage = 10, orderField, orderType, status } = req.query;
                 const options = {
                     page: parseInt(page, 10),
                     limit: parseInt(perPage, 10),
@@ -130,7 +142,22 @@ class FileController {
     getOne(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const file = yield fileMdl_1.default.findOne({ _id: req.params.id }).populate('assigned_client');
+                const file = yield fileMdl_1.default.findOne({ _id: req.
+                        params.id }).populate('assigned_client');
+                res.status(200).json({ ok: true, file });
+            }
+            catch (err) {
+                res.status(500).json({ err, ok: false });
+            }
+        });
+    }
+    tracking(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const file = yield fileMdl_1.default.findOne({
+                    _id: req.
+                        params.id
+                }).populate('assigned_client');
                 res.status(200).json({ ok: true, file });
             }
             catch (err) {
@@ -141,14 +168,42 @@ class FileController {
     update(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                // console.log(req.body)
+                // return;
                 const { id } = req.params;
-                const file = yield fileMdl_1.default.findOneAndUpdate({ _id: id }, req.body, {
-                    new: true
-                });
-                return res.json({ ok: true, file });
+                if (req.body.volume || req.body.advance) {
+                    let fileV = yield fileMdl_1.default.findOne({ _id: id });
+                    console.log(fileV.volumes.length);
+                    return;
+                    let num = 0;
+                    num += Number(fileV.volumes.length) + 1;
+                    const newVolume = {
+                        num,
+                        volume: 'hahahah/20/04'
+                    };
+                    const newKey = {
+                        num,
+                        intKey: 'hahahah/20/04'
+                    };
+                    const file = yield fileMdl_1.default.findOneAndUpdate({ _id: id }, {
+                        $push: {
+                            intKeys: newKey,
+                            volumes: newVolume
+                        }
+                    }, {
+                        new: true
+                    });
+                    return res.json({ file, message: 'Expediente actualizado correctamente', ok: true });
+                }
+                else {
+                    const file = yield fileMdl_1.default.findOneAndUpdate({ _id: id }, req.body, {
+                        new: true
+                    });
+                    return res.json({ file, message: 'Expediente actualizado correctamente', ok: true });
+                }
             }
             catch (err) {
-                res.status(500).json({ err, ok: false });
+                res.status(500).json({ err, message: 'Error al actualizar el Expediente', ok: false });
             }
         });
     }

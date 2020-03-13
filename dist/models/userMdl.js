@@ -36,6 +36,10 @@ const userModel = new Schema({
         type: String,
         required: false
     },
+    public_id: {
+        type: String,
+        required: false
+    },
     lastName: {
         type: String,
         required: [true, 'Los Apellidos son requeridos']

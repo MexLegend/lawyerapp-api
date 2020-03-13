@@ -1,10 +1,9 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -13,6 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcryptjs_1 = require("bcryptjs");
+const cloudinary = require('cloudinary');
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 const userMdl_1 = __importDefault(require("../models/userMdl"));
 class UserController {
     checkEmail(req, res) {
@@ -40,13 +45,19 @@ class UserController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { address, cellPhone, email, firstName, lastName, password } = req.body;
+                let result;
+                if (req.file && req.file !== undefined && req.file !== '' && email && firstName && lastName && password) {
+                    result = yield cloudinary.v2.uploader.upload(req.file.path);
+                }
                 const userN = new userMdl_1.default({
-                    address: req.body.address,
-                    cellPhone: req.body.cellPhone,
+                    address,
+                    cellPhone,
                     email,
                     firstName,
+                    img: (email && firstName && lastName && password && req.file && req.file !== undefined && req.file !== '') ? result.url : '',
                     lastName,
-                    password: bcryptjs_1.hashSync(password, 10)
+                    password: bcryptjs_1.hashSync(password, 10),
+                    public_id: (email && firstName && lastName && password && req.file && req.file !== undefined && req.file !== '') ? result.public_id : ''
                 });
                 const user = yield userMdl_1.default.create(userN);
                 res.status(201).json({ ok: true, user, message: 'Usuario creado correctamente' });
@@ -58,8 +69,8 @@ class UserController {
     }
     delete(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
             try {
+                const { id } = req.params;
                 const changeStatus = {
                     status: false
                 };
@@ -68,7 +79,7 @@ class UserController {
                 });
                 if (!user) {
                     return res.status(404).json({
-                        message: `No se encontro al usuario con id: ${id}`,
+                        message: 'No se encontro al Usuario',
                         ok: false
                     });
                 }
@@ -81,7 +92,7 @@ class UserController {
             catch (err) {
                 res.status(500).json({
                     err,
-                    message: `No se encontro al usuario con id: ${id}`,
+                    message: 'No se encontro al Usuario',
                     ok: false
                 });
             }
@@ -90,7 +101,7 @@ class UserController {
     get(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { page = 1, perPage = 10, filter, orderField, orderType, filterOpt = 'firstName', status } = req.query;
+                const { filter, filterOpt = 'firstName', page = 1, perPage = 10, orderField, orderType, status } = req.query;
                 const options = {
                     page: parseInt(page, 10),
                     limit: parseInt(perPage, 10),
@@ -143,13 +154,31 @@ class UserController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id } = req.params;
-                const user = yield userMdl_1.default.findOneAndUpdate({ _id: id }, req.body, {
+                const { address, cellPhone, email, firstName, lastName } = req.body;
+                const userG = yield userMdl_1.default.findOne({ _id: id });
+                let result;
+                if (req.file && req.file !== undefined && req.file !== '') {
+                    if (userG.public_id && userG.public_id !== undefined && userG.public_id !== '') {
+                        yield cloudinary.v2.uploader.destroy(userG.public_id);
+                    }
+                    result = yield cloudinary.v2.uploader.upload(req.file.path);
+                }
+                const userU = {
+                    address: (address !== undefined && address !== '') ? address : userG.address,
+                    cellPhone: (cellPhone !== undefined && cellPhone !== '') ? cellPhone : userG.cellPhone,
+                    email: (email !== undefined && email !== '') ? email : userG.email,
+                    firstName: (firstName !== undefined && firstName !== '') ? firstName : userG.firstName,
+                    img: (req.file && req.file !== undefined && req.file !== '') ? result.url : userG.img,
+                    lastName: (lastName !== undefined && lastName !== '') ? lastName : userG.lastName,
+                    public_id: (req.file && req.file !== undefined && req.file !== '') ? result.public_id : userG.public_id
+                };
+                const user = yield userMdl_1.default.findOneAndUpdate({ _id: id }, userU, {
                     new: true
                 });
-                return res.json({ ok: true, user, message: 'Datos actualizados correctamente' });
+                return res.json({ ok: true, message: 'Datos actualizados correctamente', user });
             }
             catch (err) {
-                res.status(500).json({ err, ok: false, message: 'Error al actualizar el usuario' });
+                res.status(500).json({ err, ok: false, message: 'Error al actualizar el Usuario' });
             }
         });
     }
@@ -163,32 +192,32 @@ class UserController {
                     _id: id
                 });
                 if (passAct !== '' && passNew !== '' && passNewR !== '') {
-                    if (!bcryptjs_1.compareSync(passAct, user.password)) {
-                        return res.json({ message: 'Contraseña actual incorrecta' });
-                    }
-                    else {
+                    if (bcryptjs_1.compareSync(passAct, user.password)) {
                         if (passNew === passNewR) {
                             if (passNew.length > 8) {
                                 const user = yield userMdl_1.default.findOneAndUpdate({ _id: id }, { password: passHash }, {
                                     new: true
                                 });
-                                return res.json({ ok: true, user, message: 'Contraseña actulizada correctamente' });
+                                return res.json({ message: 'Contraseña actualizada correctamente', ok: true, user });
                             }
                             else {
-                                return res.json({ message: 'La contraseña debe tener al menos 9 caracteres' });
+                                return res.json({ message: 'La contraseña debe tener al menos 9 caracteres', ok: false });
                             }
                         }
                         else {
-                            return res.json({ message: 'Las contraseñas no coinciden' });
+                            return res.json({ message: 'Las contraseñas no coinciden', ok: false });
                         }
+                    }
+                    else {
+                        return res.json({ message: 'Contraseña actual incorrecta', ok: false });
                     }
                 }
                 else {
-                    return res.json({ message: 'Todos los campos son obligatorios' });
+                    return res.json({ message: 'Todos los campos son obligatorios', ok: false });
                 }
             }
             catch (err) {
-                res.status(500).json({ err, ok: false, message: 'Ocurrió un error en el sistema' });
+                res.status(500).json({ err, message: 'Ocurrió un error en el sistema', ok: false });
             }
         });
     }

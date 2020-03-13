@@ -1,10 +1,9 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -17,19 +16,19 @@ class EmailController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 // return console.log(req.body)
-                const { nameContacto, emailContacto, phoneContacto, cityContacto, messageContacto } = req.body;
+                const { cityContact, emailContact, messageContact, nameContact, phoneContact } = req.body;
                 const contentHTML = `
                 <h1>Informacion de Usuario</h1>
                 <ul>
-                    <li>Nombre y Apellidos: ${nameContacto}</li>
-                    <li>Contacto: ${emailContacto}</li>
-                    <li>Telefono: ${phoneContacto}</li>
-                    <li>Ciudad: ${cityContacto}</li>
+                    <li>Nombre y Apellidos: ${nameContact}</li>
+                    <li>Contacto: ${emailContact}</li>
+                    <li>Telefono: ${phoneContact}</li>
+                    <li>Ciudad: ${cityContact}</li>
                 </ul>
-                <p>${messageContacto}</p>
+                <p>${messageContact}</p>
             `;
                 const data = {
-                    from: emailContacto,
+                    from: emailContact,
                     to: 'turbinarest@gmail.com',
                     subject: 'Formulario de Contacto',
                     html: contentHTML
@@ -48,7 +47,7 @@ class EmailController {
                 //     user: req.user._id
                 // });
                 // const post = await Post.create(postN);
-                return res.status(201).json({ ok: true, nameContacto, messageContacto, emailContacto });
+                return res.status(201).json({ ok: true, nameContact, messageContact, emailContact });
             }
             catch (err) {
                 res.status(500).json({ err, ok: false });

@@ -17,7 +17,7 @@ class UserRoutes {
         this.router.get('/', [authentication_1.AUTH.verifyToken, authentication_1.AUTH.verifyAdmin], userCtrl_1.default.get);
         this.router.get('/:id', [authentication_1.AUTH.verifyToken, authentication_1.AUTH.verifyAdmin], userCtrl_1.default.getOne);
         this.router.put('/:id', [authentication_1.AUTH.verifyToken, authentication_1.AUTH.verifyAdminSameUser], userCtrl_1.default.update);
-        this.router.put('/cambiar-pass/:id', [authentication_1.AUTH.verifyToken, authentication_1.AUTH.verifyAdminSameUser], userCtrl_1.default.updatePass);
+        this.router.put('/change-pass/:id', [authentication_1.AUTH.verifyToken, authentication_1.AUTH.verifyAdminSameUser], userCtrl_1.default.updatePass);
         this.router.delete('/:id', [authentication_1.AUTH.verifyToken, authentication_1.AUTH.verifyAdmin], userCtrl_1.default.delete);
     }
 }

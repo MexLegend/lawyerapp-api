@@ -11,6 +11,7 @@ class Database {
     }
     start() {
         const db = process.env.DB;
+        console.log(process.env.DB);
         mongoose_1.default.Promise = global.Promise;
         mongoose_1.default.set('useCreateIndex', true);
         mongoose_1.default

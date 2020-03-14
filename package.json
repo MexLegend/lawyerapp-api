@@ -1,6 +1,9 @@
 {
   "name": "lawyerapp-api",
   "version": "1.0.0",
+  "engines": {
+    "node": "11.1.0"
+  },
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -11,20 +14,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "@types/bcryptjs": "^2.4.2",
-    "@types/cors": "^2.8.6",
-    "@types/express": "^4.17.2",
-    "@types/jsonwebtoken": "^8.3.7",
-    "@types/mailgun-js": "^0.22.3",
-    "@types/mongoose": "^5.7.0",
-    "@types/mongoose-paginate": "^5.0.8",
-    "@types/socket.io": "^2.1.4",
-    "@types/web-push": "^3.3.0",
-    "cross-env": "^6.0.3",
-    "dotenv": "^8.2.0",
-    "nodemon": "^1.19.4"
-  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.19.0",
@@ -39,5 +28,19 @@
     "socket.io": "^2.3.0",
     "twilio": "^3.39.4",
     "web-push": "^3.4.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/cors": "^2.8.6",
+    "@types/express": "^4.17.2",
+    "@types/jsonwebtoken": "^8.3.7",
+    "@types/mailgun-js": "^0.22.3",
+    "@types/mongoose": "^5.7.0",
+    "@types/mongoose-paginate": "^5.0.8",
+    "@types/socket.io": "^2.1.4",
+    "@types/web-push": "^3.3.0",
+    "cross-env": "^6.0.3",
+    "dotenv": "^8.2.0",
+    "nodemon": "^1.19.4"
   }
 }

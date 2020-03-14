@@ -13,7 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
-const multer = require("multer");
+const multer = require('multer');
 const path_1 = require("path");
 const socket_io_1 = __importDefault(require("socket.io"));
 const storage = multer.diskStorage({
@@ -43,8 +43,8 @@ class Server {
         return this._instance || (this._instance = new this());
     }
     config() {
-        this.app.use(multer({ storage }).single('img'));
         this.app.use(cors_1.default({ origin: true, credentials: true }));
+        this.app.use(multer({ storage }).single('img'));
         this.app.use(express_1.default.json());
         this.app.use(express_1.default.urlencoded({ extended: false }));
     }

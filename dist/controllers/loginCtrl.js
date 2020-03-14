@@ -24,13 +24,13 @@ exports.default = {
                 });
                 if (!user) {
                     return res.status(400).json({
-                        message: 'Usuario o contraseña incorrecto',
+                        message: '(Usuario) o contraseña incorrecto',
                         ok: false
                     });
                 }
                 if (!bcryptjs_1.compareSync(body.password, user.password)) {
                     return res.status(404).json({
-                        message: 'Usuario o contraseña incorrecto',
+                        message: 'Usuario o (contraseña) incorrecto',
                         ok: false
                     });
                 }
@@ -47,6 +47,7 @@ exports.default = {
                 });
             }
             catch (err) {
+                console.log(err);
                 return res.status(500).json({
                     err,
                     ok: false

@@ -14,9 +14,10 @@ class FileRoutes {
     config() {
         this.router.post('/', [authentication_1.AUTH.verifyToken, authentication_1.AUTH.verifyAdmin], fileCtrl_1.default.create);
         this.router.get('/', [authentication_1.AUTH.verifyToken], fileCtrl_1.default.get);
-        this.router.get('/get/all', fileCtrl_1.default.getAll);
+        this.router.get('/all/:idClient', [authentication_1.AUTH.verifyToken], fileCtrl_1.default.getAll);
         this.router.get('/:id', fileCtrl_1.default.getOne);
         this.router.put('/:id', fileCtrl_1.default.update);
+        this.router.put('/upload/file', fileCtrl_1.default.upload);
         this.router.delete('/:id', fileCtrl_1.default.delete);
     }
 }

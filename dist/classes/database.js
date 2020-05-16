@@ -17,7 +17,8 @@ class Database {
         mongoose_1.default
             .connect(db, {
             useNewUrlParser: true,
-            useUnifiedTopology: true
+            useUnifiedTopology: true,
+            useFindAndModify: false
         })
             .then(() => {
             console.log('DB is connect');

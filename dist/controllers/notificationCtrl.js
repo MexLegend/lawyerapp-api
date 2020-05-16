@@ -11,62 +11,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const web_push_1 = require("web-push");
 const notificationMdl_1 = __importDefault(require("../models/notificationMdl"));
 class NotificationController {
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('post notification sendddddddddddddddddd');
-            // console.log(req.get('typeU'))
-            // const subscription = req.body;
-            // res.set('Content-Type', 'application/json');
-            // const name = req.get('name');
-            // const typeU = req.get('typeU');
-            // setVapidDetails(
-            //   'mailto:example@yourdomain.com',
-            //   "BFzRa32U-hCa5uiD2nHyiJx_OBHj3v2q9C_-sjyA_xMy2N6E62Uw8GFfGzMa5bQOgxGceTgajzejbTExleHbMXM",
-            //   "tN0H3R3AwtP0DBTKvcdoZCmzSKCnPZzIJEt-bHF9bOo"
-            // );
-            // let payload = JSON.stringify({
-            //   "notification": {
-            //     "title": "Pino Y Roble - Abogados",
-            //     "body": `${name} actualizo su información general`,
-            //     "icon": ""
-            //   }
-            // });
-            // let noti = {
-            //   body: 'Gracias por subscribirte!',
-            //   icon: '',
-            //   title: 'Lawyerapp'
-            // }
-            // const notiN = new Notification({
-            //   body: noti.body,
-            //   icon: noti.icon,
-            //   title: noti.title,
-            //   typeU
-            // });
-            // await Notification.create(notiN);
-            // const notifi = await Notification.find();
-            // for (const key in notifi) {
-            //   const value: any = notifi[key];
-            //   if (value.view === false && value.typeU !== req.user.role && value.typeU !== undefined) {
-            //     // console.log("Notify Role: " + value.typeU + "Request Role: " + req.user.role)
-            //     Promise.resolve(sendNotification(subscription, payload))
-            //       .then(() =>
-            //         res.status(200).json({
-            //           message: 'Notification sent'
-            //         })
-            //       )
-            //       .catch(err => {
-            //         console.log(err);
-            //         res.sendStatus(500);
-            //       })
-            //   }
-            // }
-            res.status(200).json({
-                message: 'Notification sent'
+            console.log(req.body);
+            const sub = req.body;
+            res.set('Content-Type', 'application/json');
+            web_push_1.setVapidDetails('mailto:example@yourdomain.com', 'BDrqtmJ0LDNmKOZ_FueB6Qf9qs3Peh6s5NdcsTrpHhPpsRKElfXdWuPrZM1bbUT9gVHx89wUC8-MVFPJbcPB9Oo', 'ldMrew1LrHU_FPpG7cWRQM28H0zj1GjTO2S0XxivsKg');
+            const payload = JSON.stringify({
+                notification: {
+                    title: 'Notifications are cool',
+                    body: 'Know how to send notifications through Angular with this article!',
+                    icon: 'https://www.shareicon.net/data/256x256/2015/10/02/110808_blog_512x512.png',
+                    vibrate: [100, 50, 100],
+                    data: {
+                        url: 'https://medium.com/@arjenbrandenburgh/angulars-pwa-swpush-and-swupdate-15a7e5c154ac'
+                    }
+                }
             });
-            // res.status(201).json({})
-            // const payload = JSON.stringify({ title : 'Push test' })
+            Promise.resolve(web_push_1.sendNotification(sub, payload))
+                .then(() => res.status(200).json({
+                message: 'Notification Sent'
+            }))
+                .catch(e => console.log(e));
         });
     }
     delete(req, res) {

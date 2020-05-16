@@ -14,17 +14,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const web_push_1 = require("web-push");
 const notificationMdl_1 = __importDefault(require("../models/notificationMdl"));
-exports.desconectar = (cliente) => {
+exports.disconnect = (cliente) => {
     cliente.on('disconnect', () => {
         console.log('Cliente desconectado');
     });
 };
-exports.existeUser = (cliente, io) => {
+exports.existUser = (cliente, io) => {
     cliente.on('exist-user', (payload) => __awaiter(this, void 0, void 0, function* () {
         console.log('exist!!', payload);
     }));
 };
-exports.notificacion = (cliente, io) => {
+exports.notification = (cliente, io) => {
     cliente.on('notification', (payload, body) => __awaiter(this, void 0, void 0, function* () {
         console.log('Notification Received!!', payload);
         let WEBPUSHPRIVATEKEY = process.env.WEBPUSHPRIVATEKEY;

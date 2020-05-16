@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const notificationCtrl_1 = __importDefault(require("../controllers/notificationCtrl"));
 const authentication_1 = require("../middlewares/authentication");
-class PostRoutes {
+class NotificationsRoutes {
     constructor() {
         this.router = express_1.Router();
         this.config();
@@ -19,5 +19,5 @@ class PostRoutes {
         this.router.delete('/:id', notificationCtrl_1.default.delete);
     }
 }
-const postRoutes = new PostRoutes();
-exports.default = postRoutes.router;
+const notificationsRoutes = new NotificationsRoutes();
+exports.default = notificationsRoutes.router;

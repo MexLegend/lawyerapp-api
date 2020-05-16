@@ -22,19 +22,19 @@ const postMdl_1 = __importDefault(require("../models/postMdl"));
 class PostController {
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log(req.body);
+            // return;
             try {
-                const { content, external_sources, title } = req.body;
-                let result;
-                if (req.file && req.file !== undefined && req.file !== '' && content && title) {
-                    result = yield cloudinary.v2.uploader.upload(req.file.path);
-                }
+                const { content, external_sources, title } = req.body.post;
                 const postN = new postMdl_1.default({
                     content,
                     external_sources,
-                    img: (content && title && req.file && req.file !== undefined && req.file !== '') ? result.url : '',
-                    public_id: (content && title && req.file && req.file !== undefined && req.file !== '') ? result.public_id : '',
+                    img: req.body.img.url ? req.body.img.url : 'no_image',
+                    public_id: req.body.img.public_id
+                        ? req.body.img.public_id
+                        : '',
                     title,
-                    user: req.user._id
+                    user: req.user._id,
                 });
                 const post = yield postMdl_1.default.create(postN);
                 res.status(201).json({ message: 'Articulo creado correctamente', ok: true, post });
@@ -121,7 +121,7 @@ class PostController {
     getOne(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const post = yield postMdl_1.default.findOne({ _id: req.params.id });
+                const post = yield postMdl_1.default.findOne({ _id: req.params.id }).populate('user');
                 res.status(200).json({ ok: true, post });
             }
             catch (err) {
@@ -133,20 +133,20 @@ class PostController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id } = req.params;
-                const { content, external_sources, title } = req.body;
+                const { content, external_sources, title } = req.body.post;
                 const postG = yield postMdl_1.default.findOne({ _id: id });
-                let result;
-                if (req.file && req.file !== undefined && req.file !== '') {
+                if (req.body.img.url) {
                     if (postG.public_id && postG.public_id !== undefined && postG.public_id !== '') {
                         yield cloudinary.v2.uploader.destroy(postG.public_id);
                     }
-                    result = yield cloudinary.v2.uploader.upload(req.file.path);
                 }
                 const postU = {
                     content: (content !== undefined && content !== '') ? content : postG.content,
                     external_sources: (external_sources !== undefined && external_sources !== '') ? external_sources : postG.external_sources,
-                    img: (req.file && req.file !== undefined && req.file !== '') ? result.url : postG.img,
-                    public_id: (req.file && req.file !== undefined && req.file !== '') ? result.public_id : postG.public_id,
+                    img: req.body.img.url ? req.body.img.url : postG.img,
+                    public_id: req.body.img.public_id
+                        ? req.body.img.public_id
+                        : postG.public_id,
                     title: (title !== undefined && title !== '') ? title : postG.title
                 };
                 const post = yield postMdl_1.default.findOneAndUpdate({ _id: id }, postU, {

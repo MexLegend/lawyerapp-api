@@ -23,10 +23,6 @@ class UserController {
     checkEmail(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // console.log('Bodyyyy')
-                // console.log(req.body);
-                // res.json({ message: 'req.bodyyyyy'})
-                // return;
                 const { email } = req.body;
                 const user = yield userMdl_1.default.findOne({ email });
                 if (user !== null) {
@@ -44,20 +40,18 @@ class UserController {
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { address, cellPhone, email, firstName, lastName, password } = req.body;
-                let result;
-                if (req.file && req.file !== undefined && req.file !== '' && email && firstName && lastName && password) {
-                    result = yield cloudinary.v2.uploader.upload(req.file.path);
-                }
+                const { address, cellPhone, email, firstName, lastName, password } = req.body.user;
                 const userN = new userMdl_1.default({
                     address,
                     cellPhone,
                     email,
                     firstName,
-                    img: (email && firstName && lastName && password && req.file && req.file !== undefined && req.file !== '') ? result.url : '',
+                    img: req.body.img.url ? req.body.img.url : 'no_image',
                     lastName,
                     password: bcryptjs_1.hashSync(password, 10),
-                    public_id: (email && firstName && lastName && password && req.file && req.file !== undefined && req.file !== '') ? result.public_id : ''
+                    public_id: req.body.img.public_id
+                        ? req.body.img.public_id
+                        : ''
                 });
                 const user = yield userMdl_1.default.create(userN);
                 res.status(201).json({ ok: true, user, message: 'Usuario creado correctamente' });
@@ -111,17 +105,14 @@ class UserController {
                 };
                 let filtroE = new RegExp(filter, 'i');
                 const query = {
-                    $and: [
+                    [filterOpt]: filtroE,
+                    status,
+                    role: 'USER',
+                    $or: [
                         {
-                            [filterOpt]: filtroE
+                            lawyer: req.user._id,
                         },
-                        {
-                            status
-                        },
-                        {
-                            role: 'USER'
-                        }
-                    ]
+                    ],
                 };
                 if (orderField && orderType) {
                     options.sort = {
@@ -154,23 +145,31 @@ class UserController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id } = req.params;
-                const { address, cellPhone, email, firstName, lastName } = req.body;
+                const { address, cellPhone, email, firstName, lastName } = req.body.user;
                 const userG = yield userMdl_1.default.findOne({ _id: id });
-                let result;
-                if (req.file && req.file !== undefined && req.file !== '') {
+                if (req.body.img.url) {
                     if (userG.public_id && userG.public_id !== undefined && userG.public_id !== '') {
                         yield cloudinary.v2.uploader.destroy(userG.public_id);
                     }
-                    result = yield cloudinary.v2.uploader.upload(req.file.path);
                 }
                 const userU = {
-                    address: (address !== undefined && address !== '') ? address : userG.address,
-                    cellPhone: (cellPhone !== undefined && cellPhone !== '') ? cellPhone : userG.cellPhone,
-                    email: (email !== undefined && email !== '') ? email : userG.email,
-                    firstName: (firstName !== undefined && firstName !== '') ? firstName : userG.firstName,
-                    img: (req.file && req.file !== undefined && req.file !== '') ? result.url : userG.img,
-                    lastName: (lastName !== undefined && lastName !== '') ? lastName : userG.lastName,
-                    public_id: (req.file && req.file !== undefined && req.file !== '') ? result.public_id : userG.public_id
+                    address: address !== undefined && address !== ''
+                        ? address
+                        : userG.address,
+                    cellPhone: cellPhone !== undefined && cellPhone !== ''
+                        ? cellPhone
+                        : userG.cellPhone,
+                    email: email !== undefined && email !== '' ? email : userG.email,
+                    firstName: firstName !== undefined && firstName !== ''
+                        ? firstName
+                        : userG.firstName,
+                    img: req.body.img.url ? req.body.img.url : userG.img,
+                    lastName: lastName !== undefined && lastName !== ''
+                        ? lastName
+                        : userG.lastName,
+                    public_id: req.body.img.public_id
+                        ? req.body.img.public_id
+                        : userG.public_id,
                 };
                 const user = yield userMdl_1.default.findOneAndUpdate({ _id: id }, userU, {
                     new: true

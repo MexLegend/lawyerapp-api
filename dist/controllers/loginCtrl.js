@@ -47,7 +47,6 @@ exports.default = {
                 });
             }
             catch (err) {
-                console.log(err);
                 return res.status(500).json({
                     err,
                     ok: false

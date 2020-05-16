@@ -36,6 +36,11 @@ const userModel = new Schema({
         type: String,
         required: false
     },
+    lawyer: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: false
+    },
     public_id: {
         type: String,
         required: false

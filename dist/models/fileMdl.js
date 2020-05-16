@@ -11,17 +11,6 @@ const fileModel = new SchemaM({
         type: String,
         required: [true, 'El Actor es requerido']
     },
-    advances: [
-        {
-            advance: {
-                type: String
-            },
-            date: {
-                type: Date,
-                default: Date.now
-            }
-        }
-    ],
     affair: {
         type: String,
         required: [true, 'El Asunto es requerido']
@@ -35,39 +24,14 @@ const fileModel = new SchemaM({
         type: String,
         required: [true, 'El Demandante es requerido']
     },
-    description: {
-        type: String
-    },
-    documents: [
-        {
-            date: {
-                type: Date,
-                default: Date.now
-            },
-            document: {
-                type: String
-            }
-        }
-    ],
-    intKeys: [
-        {
-            date: {
-                type: Date,
-                default: Date.now
-            },
-            intKey: {
-                type: String,
-                required: [true, 'La Clave Interna es requerida']
-            },
-            num: {
-                type: Number
-            }
-        }
-    ],
-    third: {
-        type: String
-    },
     extKey: {
+        type: String
+    },
+    intKey: {
+        type: String,
+        required: [true, 'La Clave Interna es requerida']
+    },
+    observations: {
         type: String
     },
     start_date: {
@@ -78,25 +42,14 @@ const fileModel = new SchemaM({
         type: Boolean,
         default: true
     },
+    third: {
+        type: String
+    },
     user: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'User',
         required: true
-    },
-    volumes: [
-        {
-            date: {
-                type: Date,
-                default: Date.now
-            },
-            num: {
-                type: Number
-            },
-            volume: {
-                type: String
-            }
-        }
-    ],
+    }
 });
 fileModel.plugin(mongoose_paginate_1.default);
 exports.default = mongoose_1.model('File', fileModel);

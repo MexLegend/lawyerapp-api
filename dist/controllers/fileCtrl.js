@@ -1,9 +1,10 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -16,7 +17,7 @@ class FileController {
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { actor, affair, assigned_client, defendant, intKey, comments, documents, extKey, observations, third, } = req.body;
+                const { actor, affair, assigned_client, defendant, intKey, comments, documents, extKey, observations, third } = req.body;
                 console.log(req.body, intKey);
                 // return;
                 const fileN = new fileMdl_1.default({
@@ -33,9 +34,9 @@ class FileController {
                     user: req.user._id,
                     volumes: [
                         {
-                            num: 1,
-                        },
-                    ],
+                            num: 1
+                        }
+                    ]
                 });
                 const file = yield fileMdl_1.default.create(fileN);
                 res
@@ -54,28 +55,28 @@ class FileController {
             try {
                 const { id } = req.params;
                 const changeStatus = {
-                    status: false,
+                    status: false
                 };
                 const file = yield fileMdl_1.default.findOneAndUpdate({ _id: id }, changeStatus, {
-                    new: true,
+                    new: true
                 });
                 if (!file) {
                     return res.status(404).json({
                         message: 'No se encontro el Expediente',
-                        ok: false,
+                        ok: false
                     });
                 }
                 return res.json({
                     file,
                     message: `Expediente ${file.affair} borrado`,
-                    ok: true,
+                    ok: true
                 });
             }
             catch (err) {
                 res.status(500).json({
                     err,
                     message: 'No se encontro el Expediente',
-                    ok: false,
+                    ok: false
                 });
             }
         });
@@ -84,7 +85,7 @@ class FileController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const files = yield fileMdl_1.default.find({
-                    assigned_client: req.params.idClient,
+                    assigned_client: req.params.idClient
                 }).populate('assigned_client');
                 res.status(200).json({ files, ok: true });
             }
@@ -96,18 +97,18 @@ class FileController {
     get(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { filter, filterOpt = 'affair', page = 1, perPage = 10, orderField, orderType, status, } = req.query;
+                const { filter, filterOpt = 'affair', page = 1, perPage = 10, orderField, orderType, status } = req.query;
                 const options = {
                     page: parseInt(page, 10),
                     limit: parseInt(perPage, 10),
                     populate: [
                         {
-                            path: 'assigned_client',
-                        },
+                            path: 'assigned_client'
+                        }
                     ],
                     sort: {
-                        affair: 1,
-                    },
+                        affair: 1
+                    }
                 };
                 let filtroE = new RegExp(filter, 'i');
                 const query = {
@@ -115,22 +116,22 @@ class FileController {
                     status: true,
                     $or: [
                         {
-                            user: req.user._id,
+                            user: req.user._id
                         },
                         {
-                            assigned_client: req.user._id,
-                        },
-                    ],
+                            assigned_client: req.user._id
+                        }
+                    ]
                 };
                 if (orderField && orderType) {
                     options.sort = {
-                        [orderField]: orderType,
+                        [orderField]: orderType
                     };
                 }
                 const files = yield fileMdl_1.default.paginate(query, options);
                 return res.status(200).json({
                     files,
-                    ok: true,
+                    ok: true
                 });
             }
             catch (err) {
@@ -149,19 +150,6 @@ class FileController {
             }
         });
     }
-    tracking(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const file = yield fileMdl_1.default.findOne({
-                    _id: req.params.id,
-                }).populate('assigned_client');
-                res.status(200).json({ ok: true, file });
-            }
-            catch (err) {
-                res.status(500).json({ err, ok: false });
-            }
-        });
-    }
     update(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(req.body);
@@ -172,7 +160,7 @@ class FileController {
                 if (req.body.comment) {
                     const newComment = {
                         comment: req.body.comment,
-                        numV: 1,
+                        numV: 1
                     };
                     // let fileV: any = await File.findOne({ _id: id });
                     // console.log(fileV.volumes.length)
@@ -191,15 +179,15 @@ class FileController {
                     // return;
                     const file = yield fileMdl_1.default.findOneAndUpdate({ _id: id }, {
                         $push: {
-                            comments: newComment,
-                        },
+                            comments: newComment
+                        }
                     }, {
-                        new: true,
+                        new: true
                     });
                     return res.json({
                         file,
                         message: 'Expediente actualizado correctamente',
-                        ok: true,
+                        ok: true
                     });
                 }
                 else if (req.file) {
@@ -207,29 +195,29 @@ class FileController {
                     let filePath = `${req.hostname}:3000/ftp/uploads/${req.file.originalname}`;
                     const newDocument = {
                         document: filePath,
-                        numV: 1,
+                        numV: 1
                     };
                     const file = yield fileMdl_1.default.findOneAndUpdate({ _id: id }, {
                         $push: {
-                            documents: newDocument,
-                        },
+                            documents: newDocument
+                        }
                     }, {
-                        new: true,
+                        new: true
                     });
                     return res.json({
                         file,
                         message: 'Expediente actualizado correctamente',
-                        ok: true,
+                        ok: true
                     });
                 }
                 else {
                     const file = yield fileMdl_1.default.findOneAndUpdate({ _id: id }, req.body, {
-                        new: true,
+                        new: true
                     });
                     return res.json({
                         file,
                         message: 'Expediente actualizado correctamente',
-                        ok: true,
+                        ok: true
                     });
                 }
             }
@@ -252,7 +240,7 @@ class FileController {
             catch (err) {
                 res.status(500).json({
                     err,
-                    ok: false,
+                    ok: false
                 });
             }
         });

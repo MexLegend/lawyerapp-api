@@ -10,49 +10,58 @@ const trackingModel = new SchemaM({
     comments: [
         {
             comment: {
-                type: String,
+                type: String
             },
             date: {
                 type: Date,
-                default: Date.now,
+                default: Date.now
             },
-            numV: Number,
-        },
+            numV: Number
+        }
     ],
+    date: {
+        type: Date,
+        default: Date.now
+    },
     documents: [
         {
             date: {
                 type: Date,
-                default: Date.now,
+                default: Date.now
             },
             document: {
-                type: String,
+                type: String
             },
-            numV: Number,
-        },
+            numV: Number
+        }
     ],
     file: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'File',
-        required: true,
+        required: true
     },
     status: {
-        type: String,
+        type: String
     },
     track: {
-        type: Number,
+        type: Number
     },
     volumes: [
         {
             date: {
                 type: Date,
-                default: Date.now,
+                default: Date.now
             },
             num: {
-                type: Number,
+                type: Number
             }
-        },
+        }
     ],
+    user: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    }
 });
 trackingModel.plugin(mongoose_paginate_1.default);
 exports.default = mongoose_1.model('Tracking', trackingModel);

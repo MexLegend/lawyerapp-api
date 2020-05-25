@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AUTH = void 0;
 const jsonwebtoken_1 = require("jsonwebtoken");
 exports.AUTH = {
     verifyToken(req, res, next) {

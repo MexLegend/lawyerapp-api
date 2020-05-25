@@ -28,6 +28,7 @@
     "serve-index": "^1.9.1",
     "socket.io": "^2.3.0",
     "twilio": "^3.39.4",
+    "typescript": "^3.9.3",
     "web-push": "^3.4.3"
   },
   "devDependencies": {

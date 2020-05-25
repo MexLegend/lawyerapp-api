@@ -1,9 +1,10 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -30,17 +31,19 @@ class PostController {
                     content,
                     external_sources,
                     img: req.body.img.url ? req.body.img.url : 'no_image',
-                    public_id: req.body.img.public_id
-                        ? req.body.img.public_id
-                        : '',
+                    public_id: req.body.img.public_id ? req.body.img.public_id : '',
                     title,
-                    user: req.user._id,
+                    user: req.user._id
                 });
                 const post = yield postMdl_1.default.create(postN);
-                res.status(201).json({ message: 'Articulo creado correctamente', ok: true, post });
+                res
+                    .status(201)
+                    .json({ message: 'Articulo creado correctamente', ok: true, post });
             }
             catch (err) {
-                res.status(500).json({ err, message: 'Error al crear el articulo', ok: false });
+                res
+                    .status(500)
+                    .json({ err, message: 'Error al crear el articulo', ok: false });
             }
         });
     }
@@ -136,26 +139,36 @@ class PostController {
                 const { content, external_sources, title } = req.body.post;
                 const postG = yield postMdl_1.default.findOne({ _id: id });
                 if (req.body.img.url) {
-                    if (postG.public_id && postG.public_id !== undefined && postG.public_id !== '') {
+                    if (postG.public_id &&
+                        postG.public_id !== undefined &&
+                        postG.public_id !== '') {
                         yield cloudinary.v2.uploader.destroy(postG.public_id);
                     }
                 }
                 const postU = {
-                    content: (content !== undefined && content !== '') ? content : postG.content,
-                    external_sources: (external_sources !== undefined && external_sources !== '') ? external_sources : postG.external_sources,
+                    content: content !== undefined && content !== '' ? content : postG.content,
+                    external_sources: external_sources !== undefined && external_sources !== ''
+                        ? external_sources
+                        : postG.external_sources,
                     img: req.body.img.url ? req.body.img.url : postG.img,
                     public_id: req.body.img.public_id
                         ? req.body.img.public_id
                         : postG.public_id,
-                    title: (title !== undefined && title !== '') ? title : postG.title
+                    title: title !== undefined && title !== '' ? title : postG.title
                 };
                 const post = yield postMdl_1.default.findOneAndUpdate({ _id: id }, postU, {
                     new: true
                 });
-                return res.json({ message: 'Articulo actualizado correctamente', ok: true, post });
+                return res.json({
+                    message: 'Articulo actualizado correctamente',
+                    ok: true,
+                    post
+                });
             }
             catch (err) {
-                res.status(500).json({ err, message: 'Error al actualizar el articulo', ok: false });
+                res
+                    .status(500)
+                    .json({ err, message: 'Error al actualizar el articulo', ok: false });
             }
         });
     }

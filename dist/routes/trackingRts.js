@@ -12,7 +12,9 @@ class TrackingRoutes {
         this.config();
     }
     config() {
+        this.router.delete('/:id/doc/:idDoc', trackingCtrl_1.default.delete);
         this.router.get('/:id', trackingCtrl_1.default.get);
+        this.router.get('/lawyer/all', [authentication_1.AUTH.verifyToken], trackingCtrl_1.default.getByLowyer);
         this.router.post('/:id', [authentication_1.AUTH.verifyToken, authentication_1.AUTH.verifyAdmin], trackingCtrl_1.default.create);
         this.router.put('/:id', trackingCtrl_1.default.update);
     }

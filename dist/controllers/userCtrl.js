@@ -1,9 +1,10 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -26,19 +27,28 @@ class UserController {
                 const { email } = req.body;
                 const user = yield userMdl_1.default.findOne({ email });
                 if (user !== null) {
-                    return res.json({ ok: true, exist: true, message: 'El email ya esta en uso', user });
+                    return res.json({
+                        ok: true,
+                        exist: true,
+                        message: 'El email ya esta en uso',
+                        user
+                    });
                 }
                 else {
                     return res.json({ ok: true, exist: false });
                 }
             }
             catch (err) {
-                res.status(500).json({ err, ok: false, message: 'Error al encontrar usuario' });
+                res
+                    .status(500)
+                    .json({ err, ok: false, message: 'Error al encontrar usuario' });
             }
         });
     }
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            // console.log(req.body)
+            // return;
             try {
                 const { address, cellPhone, email, firstName, lastName, password } = req.body.user;
                 const userN = new userMdl_1.default({
@@ -46,18 +56,23 @@ class UserController {
                     cellPhone,
                     email,
                     firstName,
-                    img: req.body.img.url ? req.body.img.url : 'no_image',
+                    img: req.body.img ? req.body.img.url : 'no_image',
                     lastName,
                     password: bcryptjs_1.hashSync(password, 10),
-                    public_id: req.body.img.public_id
-                        ? req.body.img.public_id
-                        : ''
+                    public_id: req.body.img ? req.body.img.public_id : ''
                 });
+                if (req.body.lawyer) {
+                    userN.lawyer = req.body.lawyer;
+                }
                 const user = yield userMdl_1.default.create(userN);
-                res.status(201).json({ ok: true, user, message: 'Usuario creado correctamente' });
+                res
+                    .status(201)
+                    .json({ ok: true, user, message: 'Usuario creado correctamente' });
             }
             catch (err) {
-                res.status(500).json({ err, ok: false, message: 'Error al crear el usuario' });
+                res
+                    .status(500)
+                    .json({ err, ok: false, message: 'Error al crear el usuario' });
             }
         });
     }
@@ -110,9 +125,9 @@ class UserController {
                     role: 'USER',
                     $or: [
                         {
-                            lawyer: req.user._id,
-                        },
-                    ],
+                            lawyer: req.user._id
+                        }
+                    ]
                 };
                 if (orderField && orderType) {
                     options.sort = {
@@ -148,14 +163,14 @@ class UserController {
                 const { address, cellPhone, email, firstName, lastName } = req.body.user;
                 const userG = yield userMdl_1.default.findOne({ _id: id });
                 if (req.body.img.url) {
-                    if (userG.public_id && userG.public_id !== undefined && userG.public_id !== '') {
+                    if (userG.public_id &&
+                        userG.public_id !== undefined &&
+                        userG.public_id !== '') {
                         yield cloudinary.v2.uploader.destroy(userG.public_id);
                     }
                 }
                 const userU = {
-                    address: address !== undefined && address !== ''
-                        ? address
-                        : userG.address,
+                    address: address !== undefined && address !== '' ? address : userG.address,
                     cellPhone: cellPhone !== undefined && cellPhone !== ''
                         ? cellPhone
                         : userG.cellPhone,
@@ -164,20 +179,24 @@ class UserController {
                         ? firstName
                         : userG.firstName,
                     img: req.body.img.url ? req.body.img.url : userG.img,
-                    lastName: lastName !== undefined && lastName !== ''
-                        ? lastName
-                        : userG.lastName,
+                    lastName: lastName !== undefined && lastName !== '' ? lastName : userG.lastName,
                     public_id: req.body.img.public_id
                         ? req.body.img.public_id
-                        : userG.public_id,
+                        : userG.public_id
                 };
                 const user = yield userMdl_1.default.findOneAndUpdate({ _id: id }, userU, {
                     new: true
                 });
-                return res.json({ ok: true, message: 'Datos actualizados correctamente', user });
+                return res.json({
+                    ok: true,
+                    message: 'Datos actualizados correctamente',
+                    user
+                });
             }
             catch (err) {
-                res.status(500).json({ err, ok: false, message: 'Error al actualizar el Usuario' });
+                res
+                    .status(500)
+                    .json({ err, ok: false, message: 'Error al actualizar el Usuario' });
             }
         });
     }
@@ -197,26 +216,44 @@ class UserController {
                                 const user = yield userMdl_1.default.findOneAndUpdate({ _id: id }, { password: passHash }, {
                                     new: true
                                 });
-                                return res.json({ message: 'Contraseña actualizada correctamente', ok: true, user });
+                                return res.json({
+                                    message: 'Contraseña actualizada correctamente',
+                                    ok: true,
+                                    user
+                                });
                             }
                             else {
-                                return res.json({ message: 'La contraseña debe tener al menos 9 caracteres', ok: false });
+                                return res.json({
+                                    message: 'La contraseña debe tener al menos 9 caracteres',
+                                    ok: false
+                                });
                             }
                         }
                         else {
-                            return res.json({ message: 'Las contraseñas no coinciden', ok: false });
+                            return res.json({
+                                message: 'Las contraseñas no coinciden',
+                                ok: false
+                            });
                         }
                     }
                     else {
-                        return res.json({ message: 'Contraseña actual incorrecta', ok: false });
+                        return res.json({
+                            message: 'Contraseña actual incorrecta',
+                            ok: false
+                        });
                     }
                 }
                 else {
-                    return res.json({ message: 'Todos los campos son obligatorios', ok: false });
+                    return res.json({
+                        message: 'Todos los campos son obligatorios',
+                        ok: false
+                    });
                 }
             }
             catch (err) {
-                res.status(500).json({ err, message: 'Ocurrió un error en el sistema', ok: false });
+                res
+                    .status(500)
+                    .json({ err, message: 'Ocurrió un error en el sistema', ok: false });
             }
         });
     }

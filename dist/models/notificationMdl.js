@@ -34,7 +34,12 @@ const notificationModel = new SchemaM({
     view: {
         type: Boolean,
         default: false
-    },
+    }
+    // user: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: 'User',
+    //     required: true
+    // }
 });
 notificationModel.plugin(mongoose_paginate_1.default);
 exports.default = mongoose_1.model('Notification', notificationModel);

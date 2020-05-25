@@ -1,13 +1,25 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
     return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const cors_1 = __importDefault(require("cors"));
@@ -21,7 +33,7 @@ const storage = multer.diskStorage({
     destination: path_1.join(__dirname, '../public/uploads'),
     filename: (req, file, cb) => {
         cb(null, file.originalname);
-    },
+    }
 });
 const socket = __importStar(require("../sockets/socket"));
 const emailRts_1 = __importDefault(require("../routes/emailRts"));
@@ -46,19 +58,18 @@ class Server {
     }
     config() {
         this.app.use(cors_1.default({ origin: true, credentials: true }));
-        this.app.use(multer({ storage, fileFilter: (req, file, cb) => {
-                let validExtensions = [
-                    'doc',
-                    'docx',
-                    'pdf',
-                ];
+        this.app.use(multer({
+            storage,
+            fileFilter: (req, file, cb) => {
+                let validExtensions = ['doc', 'docx', 'pdf'];
                 // console.log(extname(file.originalname).split('.')[1]);
                 let extension = path_1.extname(file.originalname).split('.')[1];
                 if (validExtensions.indexOf(extension) < 0) {
                     return cb(new Error('Only pdfs are allowed'));
                 }
                 cb(null, true);
-            } }).array('files'));
+            }
+        }).array('files'));
         this.app.use(express_1.default.json({ limit: '20mb' }));
         this.app.use(express_1.default.urlencoded({ extended: false, limit: '20mb' }));
         // this.app.use(express.static(join(__dirname, '../public'))

@@ -1,4 +1,5 @@
 import cors from 'cors';
+import morgan from 'morgan';
 import express, { Application, response } from 'express';
 import http from 'http';
 import socketIO from 'socket.io';
@@ -47,6 +48,7 @@ export default class Server {
 
   config(): void {
     this.app.use(cors({ origin: true, credentials: true }));
+    this.app.use(morgan('dev'));
     this.app.use(
       multer({
         storage,

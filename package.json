@@ -10,7 +10,8 @@
   "scripts": {
     "dist": "tsc -w",
     "dev": "cross-env NODE_ENV=dev nodemon dist",
-    "start": "node dist"
+    "start": "node dist",
+    "postinstall": "npm run dist"
   },
   "keywords": [],
   "author": "",

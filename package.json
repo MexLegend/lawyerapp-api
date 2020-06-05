@@ -11,7 +11,7 @@
     "dist": "tsc -w",
     "dev": "cross-env NODE_ENV=dev nodemon dist",
     "start": "node dist",
-    "postinstall": "npm run dist"
+    "postinstall": "tsc"
   },
   "keywords": [],
   "author": "",

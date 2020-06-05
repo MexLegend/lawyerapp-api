@@ -4,13 +4,13 @@ import mongoosePaginate from 'mongoose-paginate';
 const SchemaM = Schema;
 
 const documentFileModel = new SchemaM({
-  date: {
-    type: Date,
-    default: Date.now
-  },
-  uri: {
-    type: String
-  }
+    date: {
+        type: Date,
+        default: Date.now
+    },
+    uri: {
+        type: String
+    }
 });
 
 documentFileModel.plugin(mongoosePaginate);

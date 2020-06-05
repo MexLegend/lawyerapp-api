@@ -3,15 +3,15 @@ import { Router } from 'express';
 import loginController from '../controllers/loginCtrl';
 
 class LoginRoutes {
-  public router: Router = Router();
+    public router: Router = Router();
 
-  constructor() {
-    this.config();
-  }
+    constructor() {
+        this.config();
+    }
 
-  config(): void {
-    this.router.post('/', loginController.login);
-  }
+    config(): void {
+        this.router.post('/', loginController.login);
+    }
 }
 
 const loginRoutes = new LoginRoutes();

@@ -15,7 +15,7 @@ class FileController {
         documents,
         extKey,
         observations,
-        third
+        third,
       } = req.body;
       console.log(req.body, intKey);
       // return;
@@ -34,9 +34,9 @@ class FileController {
         user: req.user._id,
         volumes: [
           {
-            num: 1
-          }
-        ]
+            num: 1,
+          },
+        ],
       });
 
       const file = await File.create(fileN);
@@ -55,30 +55,30 @@ class FileController {
     try {
       const { id } = req.params;
       const changeStatus = {
-        status: false
+        status: false,
       };
 
       const file: any = await File.findOneAndUpdate({ _id: id }, changeStatus, {
-        new: true
+        new: true,
       });
 
       if (!file) {
         return res.status(404).json({
           message: 'No se encontro el Expediente',
-          ok: false
+          ok: false,
         });
       }
 
       return res.json({
         file,
         message: `Expediente ${file.affair} borrado`,
-        ok: true
+        ok: true,
       });
     } catch (err) {
       res.status(500).json({
         err,
         message: 'No se encontro el Expediente',
-        ok: false
+        ok: false,
       });
     }
   }
@@ -86,7 +86,7 @@ class FileController {
   public async getAll(req: Request, res: Response) {
     try {
       const files = await File.find({
-        assigned_client: req.params.idClient
+        assigned_client: req.params.idClient,
       }).populate('assigned_client');
       res.status(200).json({ files, ok: true });
     } catch (err) {
@@ -103,19 +103,19 @@ class FileController {
         perPage = 10,
         orderField,
         orderType,
-        status
+        status,
       } = req.query;
       const options: any = {
         page: parseInt(page, 10),
         limit: parseInt(perPage, 10),
         populate: [
           {
-            path: 'assigned_client'
-          }
+            path: 'assigned_client',
+          },
         ],
         sort: {
-          affair: 1
-        }
+          affair: 1,
+        },
       };
 
       let filtroE = new RegExp(filter, 'i');
@@ -125,17 +125,17 @@ class FileController {
         status: true,
         $or: [
           {
-            user: req.user._id
+            user: req.user._id,
           },
           {
-            assigned_client: req.user._id
-          }
-        ]
+            assigned_client: req.user._id,
+          },
+        ],
       };
 
       if (orderField && orderType) {
         options.sort = {
-          [orderField]: orderType
+          [orderField]: orderType,
         };
       }
 
@@ -143,7 +143,7 @@ class FileController {
 
       return res.status(200).json({
         files,
-        ok: true
+        ok: true,
       });
     } catch (err) {
       res.status(500).json({ err, ok: false });
@@ -163,16 +163,16 @@ class FileController {
   }
 
   public async update(req: any, res: Response) {
-    console.log(req.body);
-    // console.log(id)
-    return;
+      console.log(req.body)
+      // console.log(id)
+      return;
     try {
       const { id } = req.params;
 
       if (req.body.comment) {
         const newComment = {
           comment: req.body.comment,
-          numV: 1
+          numV: 1,
         };
 
         // let fileV: any = await File.findOne({ _id: id });
@@ -199,53 +199,53 @@ class FileController {
           { _id: id },
           {
             $push: {
-              comments: newComment
-            }
+              comments: newComment,
+            },
           },
           {
-            new: true
+            new: true,
           }
         );
 
         return res.json({
           file,
           message: 'Expediente actualizado correctamente',
-          ok: true
+          ok: true,
         });
       } else if (req.file) {
-        console.log(req.file);
-        let filePath = `${req.hostname}:3000/ftp/uploads/${req.file.originalname}`;
+        console.log(req.file)
+        let filePath = `${ req.hostname }:3000/ftp/uploads/${ req.file.originalname }`;
         const newDocument = {
           document: filePath,
-          numV: 1
+          numV: 1,
         };
-
+        
         const file = await File.findOneAndUpdate(
           { _id: id },
           {
             $push: {
-              documents: newDocument
-            }
+              documents: newDocument,
+            },
           },
           {
-            new: true
+            new: true,
           }
         );
 
         return res.json({
           file,
           message: 'Expediente actualizado correctamente',
-          ok: true
+          ok: true,
         });
       } else {
         const file = await File.findOneAndUpdate({ _id: id }, req.body, {
-          new: true
+          new: true,
         });
 
         return res.json({
           file,
           message: 'Expediente actualizado correctamente',
-          ok: true
+          ok: true,
         });
       }
     } catch (err) {
@@ -260,13 +260,13 @@ class FileController {
     try {
       const { type, id, img } = req.body;
 
-      console.log(req.file);
+      console.log(req.file)
       console.log('storage location is ', req.hostname + '/' + req.file.path);
       return res.send(req.file);
     } catch (err) {
       res.status(500).json({
         err,
-        ok: false
+        ok: false,
       });
     }
   }

@@ -4,15 +4,15 @@ import whatsappController from '../controllers/whatsappCtrl';
 import { AUTH } from '../middlewares/authentication';
 
 class WhatsappRoutes {
-  public router: Router = Router();
+    public router: Router = Router();
 
-  constructor() {
-    this.config();
-  }
+    constructor() {
+        this.config();
+    }
 
-  config(): void {
-    this.router.post('/', whatsappController.send);
-  }
+    config(): void {
+        this.router.post('/', whatsappController.send);
+    }
 }
 
 const whatsappRoutes = new WhatsappRoutes();

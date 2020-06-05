@@ -4,13 +4,16 @@ import File from '../models/fileMdl';
 import Tracking from '../models/trackingMdl';
 import { Types } from 'mongoose';
 
+
 class TrackingController {
   public async create(req: any, res: Response) {
     console.log(req.body);
     console.log(req.files);
-    console.log(req.files.length >= 1);
+    // console.log(req.file);
+    // console.log(req.files.length >= 1);
     // console.log(req.params)
     //   return;
+    // return;
     try {
       const { id } = req.params;
       const trackings = await Tracking.find({ file: id });
@@ -18,91 +21,32 @@ class TrackingController {
       //   return;
       const totalT = Number(trackings.length) + 1;
 
-      if (req.body.comment) {
-        console.log('COMMENT---');
-        const trackingN: any = new Tracking({
-          comments: [
-            {
-              comment: req.body.comment,
-              numV: 1
-            }
-          ],
-          documents: [],
-          file: id,
-          status: 'OPEN',
-          track: totalT,
-          volumes: [
-            {
-              num: 1
-            }
-          ]
-        });
+      const trackingN: any = new Tracking({
+        comments: [
+          {
+            comment: req.body.comment ? req.body.comment : '',
+            numV: 1,
+          },
+        ],
+        documents: [],
+        file: id,
+        status: req.body.status ? req.body.status : 'OPEN',
+        track: totalT,
+        volumes: [
+          {
+            num: 1,
+          },
+        ],
+      });
 
-        const tracking = await Tracking.create(trackingN);
+      const tracking = await Tracking.create(trackingN);
 
-        return res.json({
-          tracking,
-          message: 'Seguimiento creado correctamente',
-          ok: true
-        });
-      } else if (req.files && req.files.length >= 1) {
-        console.log(req.files);
-        console.log('FILES---');
+      return res.json({
+        tracking,
+        message: 'Seguimiento creado correctamente',
+        ok: true,
+      });
 
-        const trackingN: any = new Tracking({
-          comments: [],
-          documents: [],
-          file: id,
-          status: 'OPEN',
-          track: totalT,
-          volumes: [
-            {
-              num: 1
-            }
-          ]
-        });
-
-        req.files.forEach((elem: any) => {
-          let filePath = `${req.hostname}:3000/ftp/uploads/${elem.originalname}`;
-
-          trackingN.documents.push({
-            document: filePath,
-            numV: 1
-          });
-        });
-
-        const tracking = await Tracking.create(trackingN);
-
-        return res.json({
-          tracking,
-          message: 'Seguimiento creado correctamente',
-          ok: true
-        });
-      } else if (req.body.status) {
-        //    console.log(req.body.status);
-        //    console.log('STATUS---');
-        //    return;
-        const trackingN: any = new Tracking({
-          comments: [],
-          documents: [],
-          file: id,
-          status: req.body.status,
-          track: totalT,
-          volumes: [
-            {
-              num: 1
-            }
-          ]
-        });
-
-        const tracking = await Tracking.create(trackingN);
-
-        return res.json({
-          tracking,
-          message: 'Seguimiento creado correctamente',
-          ok: true
-        });
-      }
     } catch (err) {
       res
         .status(500)
@@ -114,30 +58,31 @@ class TrackingController {
     // console.log(req.params)
     // return;
     try {
-      const { id, idDoc } = req.params;
+        const { id, idDoc } = req.params;
       const tracking: any = await Tracking.findOne({
-        _id: id
+        _id: id,
       });
 
       let newDocs: any = [];
-
+      
       newDocs = tracking.documents.filter((doc: any) => {
+
         return doc._id.toString() !== idDoc.toString();
       });
 
       const trackingU: any = await Tracking.findOneAndUpdate(
         {
-          _id: id
+          _id: id,
         },
         {
-          $set: { documents: newDocs }
+          $set: { documents: newDocs },
         },
         {
           new: true
         }
       );
 
-      console.log('NEWDOCS>>', newDocs);
+        console.log('NEWDOCS>>',newDocs)
       res.status(200).json({ tracking: trackingU, ok: true });
     } catch (err) {
       res.status(500).json({ err, ok: false });
@@ -146,63 +91,63 @@ class TrackingController {
 
   public async getByLowyer(req: any, res: Response) {
     try {
-      console.log(req.user._id);
-      // const files: any = await File.aggregate([
-      //   {
-      //     $match: {
-      //       user: req.user._id,
-      //     },
-      //   },
-      //   {
-      //     $lookup: {
-      //       from: 'trackings',
-      //       localField: '_id',
-      //       foreignField: 'file',
-      //       as: 'tracks',
-      //     },
-      //   },
-      // ])
+        console.log(req.user._id)
+    // const files: any = await File.aggregate([
+    //   {
+    //     $match: {
+    //       user: req.user._id,
+    //     },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'trackings',
+    //       localField: '_id',
+    //       foreignField: 'file',
+    //       as: 'tracks',
+    //     },
+    //   },
+    // ])
 
-      const files: any = await File.aggregate([
-        {
-          $match: {
-            user: Types.ObjectId(req.user._id)
-          }
+    const files: any = await File.aggregate([
+      {
+        $match: {
+          "user": Types.ObjectId(req.user._id),
         },
-        {
-          $lookup: {
-            from: 'trackings',
-            let: { idFile: '$_id' },
-            pipeline: [
-              {
-                $match: {
-                  $expr: {
-                    $and: [{ $eq: ['$file', '$$idFile'] }]
-                  }
-                }
-              }
-            ],
-            as: 'tracks'
-          }
+      },
+      {
+        $lookup: {
+          from: 'trackings',
+          let: { idFile: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [{ $eq: ['$file', '$$idFile'] }],
+                },
+              },
+            },
+          ],
+          as: 'tracks',
         },
-        {
-          $lookup: {
-            from: 'users',
-            let: { client: '$assigned_client' },
-            pipeline: [
-              {
-                $match: {
-                  $expr: {
-                    $eq: ['$_id', '$$client']
-                  }
-                }
-              }
-            ],
-            as: 'assigned_client'
-          }
-        }
-      ]);
-
+      },
+      {
+        $lookup: {
+          from: 'users',
+          let: { client: '$assigned_client' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ['$_id', '$$client'],
+                },
+              },
+            },
+          ],
+          as: 'assigned_client',
+        },
+      },
+    ]);
+      
       res.status(200).json({ files, ok: true });
     } catch (err) {
       res.status(500).json({ err, ok: false });
@@ -218,7 +163,7 @@ class TrackingController {
         perPage = 10,
         orderField,
         orderType,
-        status
+        status,
       } = req.query;
       const { id } = req.params;
       console.log(id);
@@ -227,12 +172,12 @@ class TrackingController {
         limit: parseInt(perPage, 10),
         populate: [
           {
-            path: 'file'
-          }
+            path: 'file',
+          },
         ],
         sort: {
-          track: 1
-        }
+          track: 1,
+        },
       };
 
       let filtroE = new RegExp(filter, 'i');
@@ -241,14 +186,14 @@ class TrackingController {
         status: 'OPEN',
         $or: [
           {
-            file: id
-          }
-        ]
+            file: id,
+          },
+        ],
       };
 
       if (orderField && orderType) {
         options.sort = {
-          [orderField]: orderType
+          [orderField]: orderType,
         };
       }
 
@@ -256,7 +201,7 @@ class TrackingController {
 
       return res.status(200).json({
         trackings,
-        ok: true
+        ok: true,
       });
     } catch (err) {
       res.status(500).json({ err, ok: false });
@@ -282,96 +227,114 @@ class TrackingController {
     // return;
     try {
       const { id } = req.params;
+      const trackingBD: any = await Tracking.findOne({ _id: id });
+      let documents: any[] = [];
 
-      if (req.body.comment) {
-        const newComment = {
-          comment: req.body.comment,
-          numV: 1
-        };
-
-        // let fileV: any = await Tracking.findOne({ _id: id });
-        // console.log(fileV.volumes.length)
-        // return;
-
-        // let num = 0;
-        // num += Number(fileV.volumes.length) + 1;
-
-        // const newVolume = {
-        //   num,
-        //   volume: 'hahahah/20/04'
-        // }
-
-        // const newKey = {
-        //   num,
-        //   intKey: 'hahahah/20/04'
-        // }
-
-        console.log(newComment);
-        // return;
-
-        const tracking = await Tracking.findOneAndUpdate(
-          { _id: id },
-          {
-            $push: {
-              comments: newComment
-            }
-          },
-          {
-            new: true
-          }
-        );
-
-        return res.json({
-          tracking,
-          message: 'Comentarios agregados',
-          ok: true
-        });
-      } else if (req.files && req.body.tracking) {
-        console.log(req.files);
-        let documents: any[] = [];
+      if (req.files) {
         req.files.forEach((elem: any) => {
-          let filePath = `${req.hostname}:3000/ftp/uploads/${elem.originalname}`;
+          let filePath = `${req.hostname}:${process.env.PORT || 3000}/ftp/uploads/${elem.originalname}`;
 
-          documents.push({
-            document: filePath,
-            numV: 1
-          });
+
+            const existD = trackingBD.documents.findIndex((e: any) => e.document === filePath);
+
+            console.log(existD);
+
+            if (existD === -1) {
+              documents.push({
+                document: filePath,
+                numV: 1,
+              });
+            }
         });
         console.log(documents);
-        // return;
 
         const tracking = await Tracking.findOneAndUpdate(
-          { _id: id },
-          {
-            $push: {
-              documents
+            { _id: id },
+            {
+              $push: {
+                documents,
+              },
+            },
+            {
+              new: true,
             }
-          },
-          {
-            new: true
-          }
-        );
+          );
 
-        return res.json({
-          tracking,
-          message: 'Archivos agregados correctamente',
-          ok: true
-        });
-      } else {
-        const tracking = await Tracking.findOneAndUpdate(
-          { _id: id },
-          req.body,
-          {
-            new: true
-          }
-        );
-
-        return res.json({
-          tracking,
-          message: 'Expediente actualizado correctamente',
-          ok: true
-        });
+          return res.json({
+            tracking,
+            message: 'Archivos agregados correctamente',
+            ok: true,
+          });
       }
+
+      return;
+
+      // if (req.files) {
+      //   console.log(req.files);
+      //   let documents: any[] = [];
+        
+
+      //   let existDocs: any[] = [];
+
+
+      //   req.files.forEach((elem: any) => {
+      //     let filePath = `${req.hostname}:3000/ftp/uploads/${elem.originalname}`;
+
+      //         console.log(trackingBD.documents.length);
+      //     if (trackingBD.documents.length >= 1) {
+
+      //       trackingBD.documents.filter((doc: any) => {
+      //         if(doc.document !== filePath) {
+      //           // existDocs.push({
+      //           //   name: elem.originalname,
+      //           // });
+      //           documents.push({
+      //             document: filePath,
+      //             numV: 1,
+      //           });
+      //         }
+      //       });
+      //     } else {
+      //       documents.push({
+      //         document: filePath,
+      //         numV: 1,
+      //       });
+      //     }
+
+      //   });
+      //   // console.log(documents);
+      //   console.log(`NEWDOCS:`, documents)
+      //   // return;
+
+      //   if(existDocs.length >= 1) {
+      //     let word = existDocs.length === 1 ? 'El archivo ya existe' : 'Los archivos ya existen';
+      //     return res.json({
+      //       message: word,
+      //       docs: existDocs,
+      //       ok: true,
+      //     });
+      //   } else {
+      //     const tracking = await Tracking.findOneAndUpdate(
+      //       { _id: id },
+      //       {
+      //         $push: {
+      //           documents,
+      //         },
+      //       },
+      //       {
+      //         new: true,
+      //       }
+      //     );
+
+      //     return res.json({
+      //       tracking,
+      //       message: 'Archivos agregados correctamente',
+      //       ok: true,
+      //     });
+
+      //   }
+
+      // }
     } catch (err) {
       res
         .status(500)

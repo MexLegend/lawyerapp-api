@@ -4,15 +4,15 @@ import emailController from '../controllers/emailCtrl';
 import { AUTH } from '../middlewares/authentication';
 
 class EmailRoutes {
-  public router: Router = Router();
+    public router: Router = Router();
 
-  constructor() {
-    this.config();
-  }
+    constructor() {
+        this.config();
+    }
 
-  config(): void {
-    this.router.post('/', emailController.send);
-  }
+    config(): void {
+        this.router.post('/', emailController.send);
+    }
 }
 
 const emailRoutes = new EmailRoutes();

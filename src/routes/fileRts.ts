@@ -17,11 +17,7 @@ class FileRoutes {
       fileController.create
     );
     this.router.get('/', [AUTH.verifyToken], fileController.get);
-    this.router.get(
-      '/all/:idClient',
-      [AUTH.verifyToken],
-      fileController.getAll
-    );
+    this.router.get('/all/:idClient', [AUTH.verifyToken], fileController.getAll);
     this.router.get('/:id', fileController.getOne);
     this.router.put('/:id', fileController.update);
     this.router.put('/upload/file', fileController.upload);

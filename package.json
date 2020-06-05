@@ -2,14 +2,16 @@
   "name": "lawyerapp-api",
   "version": "1.0.0",
   "engines": {
-    "node": "11.1.0"
+    "node": "11.1.0",
+     "npm": "6.9.0"
   },
   "description": "",
   "main": "index.js",
   "scripts": {
     "dist": "tsc -w",
     "dev": "cross-env NODE_ENV=dev nodemon dist",
-    "start": "node dist"
+    "start": "node dist",
+    "postinstall": "ng build --output-path angularapp  --aot --prod"
   },
   "keywords": [],
   "author": "",
@@ -29,9 +31,13 @@
     "socket.io": "^2.3.0",
     "twilio": "^3.39.4",
     "typescript": "^3.9.3",
-    "web-push": "^3.4.3"
+    "web-push": "^3.4.3",
+    "@angular/cli": "^9.1.7",
+    "@angular/compiler-cli": "^9.1.9"
   },
   "devDependencies": {
+    "@angular/cli": "^9.1.7",
+    "@angular/compiler-cli": "^9.1.9",
     "@types/bcryptjs": "^2.4.2",
     "@types/cors": "^2.8.6",
     "@types/express": "^4.17.2",

@@ -10,8 +10,7 @@
   "scripts": {
     "dist": "tsc -w",
     "dev": "cross-env NODE_ENV=dev nodemon dist",
-    "start": "node dist",
-    "postinstall": "ng build --output-path angularapp  --aot --prod"
+    "start": "node dist"
   },
   "keywords": [],
   "author": "",
@@ -31,9 +30,7 @@
     "socket.io": "^2.3.0",
     "twilio": "^3.39.4",
     "typescript": "^3.9.3",
-    "web-push": "^3.4.3",
-    "@angular/cli": "^9.1.7",
-    "@angular/compiler-cli": "^9.1.9"
+    "web-push": "^3.4.3"
   },
   "devDependencies": {
     "@angular/cli": "^9.1.7",

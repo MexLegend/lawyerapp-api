@@ -11,9 +11,14 @@ class TrackingRoutes {
   }
 
   config(): void {
-      this.router.delete('/:id/doc/:idDoc', trackingController.delete);
+    this.router.delete('/:id', trackingController.delete);
+    this.router.delete('/:id/doc/:idDoc', trackingController.deleteDoc);
     this.router.get('/:id', trackingController.get);
-    this.router.get('/lawyer/all', [AUTH.verifyToken], trackingController.getByLowyer);
+    this.router.get(
+      '/lawyer/all',
+      [AUTH.verifyToken],
+      trackingController.getByLowyer
+    );
     this.router.post(
       '/:id',
       [AUTH.verifyToken, AUTH.verifyAdmin],

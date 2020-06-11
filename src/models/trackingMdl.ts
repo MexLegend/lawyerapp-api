@@ -4,18 +4,9 @@ import mongoosePaginate from 'mongoose-paginate';
 const SchemaM = Schema;
 
 const trackingModel = new SchemaM({
-  comments: [
-    {
-      comment: {
-        type: String,
-      },
-      date: {
-        type: Date,
-        default: Date.now,
-      },
-      numV: Number,
-    },
-  ],
+  comment: {
+      type: String
+  },
   date: {
     type: Date,
     default: Date.now

@@ -150,7 +150,6 @@ class UserController {
 
     public async update(req: any, res: Response) {
 
-        console.log(req.body)
         // return;
         try {
             const { id } = req.params;
@@ -169,7 +168,6 @@ class UserController {
                   : userG.public_id,
               };
             } else {
-              console.log('herererere');
               const {
                 address,
                 cellPhone,

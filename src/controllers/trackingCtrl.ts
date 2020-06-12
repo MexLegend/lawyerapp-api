@@ -28,9 +28,7 @@ class TrackingController {
 
       if (req.files) {
         req.files.forEach((elem: any) => {
-          let filePath = `${req.hostname}:${
-            process.env.PORT || 3000
-          }/ftp/uploads/${elem.originalname}`;
+          let filePath = `${req.hostname}/ftp/uploads/${elem.originalname}`;
 
           docs.push(filePath);
 
@@ -208,7 +206,6 @@ class TrackingController {
       let filtroE = new RegExp(filter, 'i');
 
       const query = {
-        status: 'OPEN',
         $or: [
           {
             file: id

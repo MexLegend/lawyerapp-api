@@ -4,47 +4,46 @@ import mongoosePaginate from 'mongoose-paginate';
 const SchemaM = Schema;
 
 const trackingModel = new SchemaM({
-  comment: {
-      type: String
-  },
   date: {
     type: Date,
     default: Date.now
   },
-  documents: [
-    {
-      date: {
-        type: Date,
-        default: Date.now,
-      },
-      document: {
-        type: String,
-      },
-      numV: Number,
-    },
-  ],
-  file: {
+  evidenceId: {
     type: Schema.Types.ObjectId,
-    ref: 'File',
-    required: true,
+    ref: 'Evidence'
   },
-  status: {
-    type: String,
-  },
-  track: {
-    type: Number,
-  },
-  volumes: [
+  trackingEvidences: [
     {
-      date: {
-        type: Date,
-        default: Date.now,
-      },
-      num: {
-        type: Number,
-      },
-    },
-  ]
+      evidence: {
+        type: Schema.Types.ObjectId,
+        ref: 'Evidence'
+      }
+    }
+  ],
+  message: {
+    type: String
+  },
+  noteId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Note'
+  },
+  trackingNotes: [
+    {
+      note: {
+        type: Schema.Types.ObjectId,
+        ref: 'Note'
+      }
+    }
+  ],
+  status: {
+    default: 'ACTIVE',
+    type: String
+  },
+  volume: {
+    type: Schema.Types.ObjectId,
+    ref: 'Volume',
+    required: true
+  }
 });
 
 trackingModel.plugin(mongoosePaginate);

@@ -3,7 +3,7 @@ import mongoosePaginate from 'mongoose-paginate';
 
 const SchemaM = Schema;
 
-const fileModel = new SchemaM({
+const caseModel = new SchemaM({
   actor: {
     type: String,
     required: [true, 'El Actor es requerido']
@@ -30,14 +30,14 @@ const fileModel = new SchemaM({
   },
   observations: {
     type: String
-  },  
+  },
   start_date: {
     type: Date,
     default: Date.now
   },
   status: {
-    type: Boolean,
-    default: true
+    type: String,
+    default: 'ACTIVE'
   },
   third: {
     type: String
@@ -49,5 +49,5 @@ const fileModel = new SchemaM({
   }
 });
 
-fileModel.plugin(mongoosePaginate);
-export default model('File', fileModel);
+caseModel.plugin(mongoosePaginate);
+export default model('Case', caseModel);

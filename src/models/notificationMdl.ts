@@ -4,39 +4,37 @@ import mongoosePaginate from 'mongoose-paginate';
 const SchemaM = Schema;
 
 const notificationModel = new SchemaM({
-    body: {
-        type: String,
-        required: [true, 'El Contenido es requerido']
-    },
-    created_at: {
-        type: Date,
-        default: Date.now
-    },
-    icon: {
-        type: String,
-        required: false
-    },
-    status: {
-        type: Boolean,
-        default: true
-    },
-    title: {
-        type: String,
-        required: [true, 'El Titulo es requerido']
-    },
-    typeU: {
-        type: String,
-        required: [true, 'El Tipo es requerido']
-    },
-    view: {
-        type: Boolean,
-        default: false
-    },
-    // user: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: 'User',
-    //     required: true
-    // }
+  created_at: {
+    type: Date,
+    default: Date.now
+  },
+  image: {
+    type: String,
+    default: null
+  },
+  show_buttons: {
+    type: Boolean,
+    default: false
+  },
+  title: {
+    type: String,
+    required: [true, 'El titulo es requerido']
+  },
+  type: {
+    type: String,
+    required: [true, 'El tipo de notificación es requerido']
+  },
+  url_path: {
+    type: String,
+    required: [true, 'El path es requerido']
+  },
+  user_actor: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  user_actor_role: {
+    type: String
+  }
 });
 
 notificationModel.plugin(mongoosePaginate);

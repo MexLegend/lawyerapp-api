@@ -4,34 +4,42 @@ import userController from '../controllers/userCtrl';
 import { AUTH } from '../middlewares/authentication';
 
 class UserRoutes {
-    public router: Router = Router();
+  public router: Router = Router();
 
-    constructor() {
-        this.config();
-    }
+  constructor() {
+    this.config();
+  }
 
-    config(): void {
-        this.router.post('/', userController.create);
-        this.router.post('/check/email', userController.checkEmail);
-        this.router.get(
-            '/',
-            [AUTH.verifyToken, AUTH.verifyAdmin],
-            userController.get
-        );
-        this.router.get(
-            '/:id', [AUTH.verifyToken, AUTH.verifyAdmin],
-            userController.getOne
-        );
-        this.router.put(
-            '/:id', [AUTH.verifyToken, AUTH.verifyAdminSameUser],
-            userController.update
-        );
-        this.router.put(
-            '/change-pass/:id', [AUTH.verifyToken, AUTH.verifyAdminSameUser],
-            userController.updatePass
-        );
-        this.router.delete('/:id', [AUTH.verifyToken, AUTH.verifyAdmin], userController.delete);
-    }
+  config(): void {
+    this.router.post('/', userController.create);
+    this.router.post('/check/email', userController.checkEmail);
+    this.router.get('/', [AUTH.verifyToken], userController.get);
+    this.router.get('/lawyers', userController.getLawyers);
+    this.router.get('/:id', [AUTH.verifyToken], userController.getOne);
+    this.router.put('/:id', [AUTH.verifyToken], userController.update);
+
+    this.router.put(
+      '/image/:id',
+      [AUTH.verifyToken, AUTH.verifyAdminAssociated],
+      userController.updateImage
+    );
+
+    this.router.put(
+      '/change-pass/:id',
+      [AUTH.verifyToken, AUTH.verifyAdminAssociated],
+      userController.updatePass
+    );
+    this.router.put(
+      '/rol/:id',
+      [AUTH.verifyToken, AUTH.verifyAdmin],
+      userController.updateRol
+    );
+    this.router.delete(
+      '/:id',
+      [AUTH.verifyToken, AUTH.verifyAdminAssociated],
+      userController.delete
+    );
+  }
 }
 
 const userRoutes = new UserRoutes();

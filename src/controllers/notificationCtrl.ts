@@ -1,41 +1,116 @@
-import { Request, Response, request } from 'express';
-import { setVapidDetails, sendNotification } from 'web-push';
+import { Request, Response } from 'express';
+import { Types } from 'mongoose';
 
 import Notification from '../models/notificationMdl';
+import usersNotifications from '../models/usersNotificationsMdl';
+import Server from '../classes/server';
+import { connectedUsers } from '../sockets/socket';
 
 class NotificationController {
+  // Insert a New Row/Document Into The Notifications Collection
   public async create(req: any, res: Response) {
-    console.log(req.body)
-    const sub = req.body;
-    res.set('Content-Type', 'application/json')
-    
-    setVapidDetails(
-      'mailto:example@yourdomain.com',
-      'BDrqtmJ0LDNmKOZ_FueB6Qf9qs3Peh6s5NdcsTrpHhPpsRKElfXdWuPrZM1bbUT9gVHx89wUC8-MVFPJbcPB9Oo',
-      'ldMrew1LrHU_FPpG7cWRQM28H0zj1GjTO2S0XxivsKg'
-    );
+    try {
+      const notificationData: any = {
+        image: req.body.image ? req.body.image : null,
+        show_buttons: req.body.show_buttons ? req.body.show_buttons : false,
+        title: req.body.title,
+        type: req.body.type,
+        url_path: req.body.url_path,
+        user_actor: Types.ObjectId(req.body.user_actor),
+        user_actor_role: req.body.user_actor_role
+      };
 
-    const payload = JSON.stringify({
-        notification: {
-          title: 'Notifications are cool',
-          body: 'Know how to send notifications through Angular with this article!',
-          icon: 'https://www.shareicon.net/data/256x256/2015/10/02/110808_blog_512x512.png',
-          vibrate: [100, 50, 100],
-          data: {
-            url: 'https://medium.com/@arjenbrandenburgh/angulars-pwa-swpush-and-swupdate-15a7e5c154ac'
+      const server = Server.instance;
+      const notificationCreated: any = await Notification.create(
+        notificationData
+      );
+
+      const userNotificationData = new usersNotifications({
+        allowed_roles: req.body.allowed_roles ? req.body.allowed_roles : [],
+        notification_id: notificationCreated._id,
+        user_receiver: req.body.user_receiver
+          ? Types.ObjectId(req.body.user_receiver)
+          : null,
+        users_viewed: req.body.users_viewed ? req.body.users_viewed : []
+      });
+
+      await usersNotifications.create(userNotificationData).then(() => {
+        const notificationCompleted = {
+          ...notificationCreated._doc,
+          user_actor: req.body.user_actor_name,
+          allowed_roles: req.body.allowed_roles
+            ? JSON.stringify(req.body.allowed_roles)
+            : [],
+          user_receiver: req.body.user_receiver
+            ? Types.ObjectId(req.body.user_receiver)
+            : null
+        };
+
+        // Send Notification To Client By His Socket ID
+        connectedUsers.getConnectedUsers().then((users) => {
+          const clientConnected = users.find(
+            (user) => user.publicId === req.body.user_receiver
+          );
+
+          // Emit Notification To Especific Client Excluding Sender
+          if (clientConnected) {
+            server.io
+              .in(clientConnected.socketId)
+              .emit(
+                'get-private-socket-event-notification',
+                notificationCompleted
+              );
+          } else {
+            // Validate If Notification Is For A Group Of Clients
+            if (req.body.allowed_roles) {
+              const clientRoom = req.body.allowed_roles.find((role: any) =>
+                users.find((user) =>
+                  role === 'ALL'
+                    ? true
+                    : user.userRooms.filter((room) => room === role)
+                )
+              );
+
+              // Validate If Client Is In Especified Room
+              if (clientRoom) {
+                // Emit Notification To All Connected Clients Excluding Sender
+                if (clientRoom === 'ALL') {
+                  const sender = connectedUsers.getConnectedUserByPublicId(
+                    req.body.user_actor
+                  );
+
+                  sender.client.broadcast.emit(
+                    'get-public-socket-event-notification',
+                    notificationCompleted
+                  );
+                }
+                // Emit Notification To A Group Of Connected Clients Excluding Sender
+                else {
+                  server.io
+                    .to(JSON.stringify(clientRoom))
+                    .emit(
+                      'get-group-socket-event-notification',
+                      notificationCompleted
+                    );
+                }
+              }
+            }
           }
-        }
-    });
 
-    Promise.resolve(sendNotification(sub, payload))
-      .then(() => res.status(200).json({
-        message : 'Notification Sent'
-      }))
-      .catch(e => console.log(e))
-    
-        
+          return res.json({
+            notification: notificationCompleted,
+            ok: true
+          });
+        });
+      });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ err, message: 'Error al crear la notificación', ok: false });
+    }
   }
 
+  // Delete Temporary One Row/Document From Notifications Collection
   public async delete(req: Request, res: Response) {
     const { id } = req.params;
     try {
@@ -43,9 +118,13 @@ class NotificationController {
         status: false
       };
 
-      const notification: any = await Notification.findOneAndUpdate({ _id: id }, changeStatus, {
-        new: true
-      });
+      const notification: any = await Notification.findOneAndUpdate(
+        { _id: id },
+        changeStatus,
+        {
+          new: true
+        }
+      );
       if (!notification) {
         return res.status(404).json({
           message: `No se encontro al notification con id: ${id}`,
@@ -67,51 +146,26 @@ class NotificationController {
     }
   }
 
-  public async getAll(req: Request, res: Response) {
-    return console.log(req.body);
-  }
-
+  // Get All Rows/Documents From Notifications Collection
   public async get(req: Request, res: Response) {
     try {
-      const {
-        page = 1,
-        perPage = 10,
-        filter,
-        orderField,
-        orderType,
-        filterOpt = 'title',
-        status
-      } = req.query;
-      const options: any = {
-        page: parseInt(page, 10),
-        limit: parseInt(perPage, 10),
-        sort: {
-          title: 1
-        }
-      };
+      const { id, role } = req.params;
 
-      let filtroE = new RegExp(filter, 'i');
+      const userNotifications: any = await usersNotifications
+        .find({
+          $or: [
+            { user_receiver: id },
+            { allowed_roles: { $in: [role] } },
+            { allowed_roles: { $in: ['ALL'] } }
+          ]
+        })
+        .populate({
+          path: 'notification_id',
+          populate: [{ path: 'user_actor' }]
+        });
 
-      const query = {
-        $and: [
-          {
-            [filterOpt]: filtroE
-          },
-          {
-            status
-          }
-        ]
-      };
-
-      if (orderField && orderType) {
-        options.sort = {
-          [orderField]: orderType
-        };
-      }
-
-      const notifications = await Notification.paginate(query, options);
-      return res.status(200).json({
-        notifications,
+      return res.json({
+        notification: userNotifications,
         ok: true
       });
     } catch (err) {
@@ -119,6 +173,7 @@ class NotificationController {
     }
   }
 
+  // Get One Row/Document From Notifications Collection
   public async getOne(req: Request, res: Response) {
     try {
       const notification = await Notification.findOne({ _id: req.params.id });
@@ -128,13 +183,18 @@ class NotificationController {
     }
   }
 
+  // Update One or More Rows/Documents From Notifications Collection
   public async update(req: Request, res: Response) {
     try {
       const { id } = req.params;
 
-      const notification = await Notification.findOneAndUpdate({ _id: id }, req.body, {
-        new: true
-      });
+      const notification = await Notification.findOneAndUpdate(
+        { _id: id },
+        req.body,
+        {
+          new: true
+        }
+      );
       return res.json({ ok: true, notification });
     } catch (err) {
       res.status(500).json({ err, ok: false });

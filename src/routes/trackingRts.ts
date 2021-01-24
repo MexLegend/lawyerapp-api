@@ -11,20 +11,27 @@ class TrackingRoutes {
   }
 
   config(): void {
-    this.router.delete('/:id', trackingController.delete);
-    this.router.delete('/:id/doc/:idDoc', trackingController.deleteDoc);
-    this.router.get('/:id', trackingController.get);
+    this.router.post(
+      '/:idVolume',
+      [AUTH.verifyToken, AUTH.verifyAdmin],
+      trackingController.create
+    );
+    this.router.get('/all/:idVolume', trackingController.get);
+    this.router.get(
+      '/client/:idCase/:idClient',
+      [AUTH.verifyToken],
+      trackingController.getByClient
+    );
     this.router.get(
       '/lawyer/all',
       [AUTH.verifyToken],
       trackingController.getByLowyer
     );
-    this.router.post(
-      '/:id',
-      [AUTH.verifyToken, AUTH.verifyAdmin],
-      trackingController.create
-    );
-    this.router.put('/:id', trackingController.update);
+    this.router.get('/:id', trackingController.getOne);
+    this.router.put('/:idTracking', trackingController.update);
+    this.router.put('/status/:idTrack', trackingController.changeTemp);
+    this.router.delete('/:id', trackingController.delete);
+    this.router.delete('/:id/doc/:idDoc', trackingController.deleteDoc);
   }
 }
 

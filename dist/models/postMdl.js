@@ -111,6 +111,7 @@ const postModel = new SchemaM({
     ],
     processState: {
         type: String,
+        default: "REVIEWING",
         required: false
     },
     public_id: {

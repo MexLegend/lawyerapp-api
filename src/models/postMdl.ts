@@ -55,6 +55,7 @@ const postModel = new SchemaM({
   },
   postImage: {
     type: String,
+    default: null,
     required: false
   },
   postImagesList: [

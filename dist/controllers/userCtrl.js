@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -51,21 +62,9 @@ class UserController {
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { address, cellPhone, email, firstName, lastName, password, role } = req.body.user;
-                const userN = {
-                    address,
-                    cellPhone,
-                    email,
-                    firstName,
-                    img: req.body.img ? req.body.img.url : null,
-                    lawyers: { lawyer: req.body.lawyer ? req.body.lawyer : null },
-                    lastName,
-                    password: bcryptjs_1.hashSync(password, 10),
-                    public_id: req.body.img ? req.body.img.public_id : '',
-                    public_lawyer_id: req.body.public_lawyer_id,
-                    role
-                };
-                const user = yield userMdl_1.default.create(userN);
+                const _a = req.body.user, { emailAdmin: email, password1: password, password2: password2, role } = _a, userData = __rest(_a, ["emailAdmin", "password1", "password2", "role"]);
+                const userObject = Object.assign({ email, img: req.body.img ? req.body.img.url : null, lawyers: { lawyer: req.body.lawyer ? req.body.lawyer : null }, password: bcryptjs_1.hashSync(password, 10), public_id: req.body.img ? req.body.img.public_id : '', public_lawyer_id: req.body.public_lawyer_id, role }, userData);
+                const user = yield userMdl_1.default.create(userObject);
                 // Create Contact
                 if (req.body.lawyer && role !== 'NEW') {
                     // Add Client Contact To Lawyer Contacts List
@@ -219,33 +218,19 @@ class UserController {
             // return;
             try {
                 const { id } = req.params;
-                let userG = yield userMdl_1.default.findOne({ _id: id });
-                let userU;
-                let user;
-                if (req.body.img) {
-                    if (userG.public_id &&
-                        userG.public_id !== undefined &&
-                        userG.public_id !== '') {
-                        yield cloudinary.v2.uploader.destroy(userG.public_id);
+                const { userImage: { url: img = null, public_id = null } = {}, userData } = req.body;
+                // Remove Cloudinary User Main Image And Update It If Request Data Has Image Value
+                if (img) {
+                    const userRequestData = yield userMdl_1.default.findById({ _id: id });
+                    if (userRequestData.public_id &&
+                        userRequestData.public_id !== undefined &&
+                        userRequestData.public_id !== '') {
+                        yield cloudinary.v2.uploader.destroy(userRequestData.public_id);
                     }
                 }
-                if (req.body.user) {
-                    const { address, biography, cellPhone, email, firstName, lastName, role } = req.body.user;
-                    userU = {
-                        role: role !== '' ? role : userG.role,
-                        address: address !== '' ? address : userG.address,
-                        biography: biography !== '' ? biography : userG.biography,
-                        cellPhone: cellPhone !== '' ? cellPhone : userG.cellPhone,
-                        email: email !== '' ? email : userG.email,
-                        firstName: firstName !== '' ? firstName : userG.firstName,
-                        lastName: lastName !== '' ? lastName : userG.lastName,
-                        img: req.body.img ? req.body.img.url : userG.img,
-                        public_id: req.body.img ? req.body.img.public_id : userG.public_id
-                    };
-                    user = yield userMdl_1.default.findOneAndUpdate({ _id: id }, userU, {
-                        new: true
-                    });
-                }
+                const user = yield userMdl_1.default.findByIdAndUpdate({ _id: id }, Object.assign(Object.assign(Object.assign({}, (img ? { img } : {})), (public_id ? { public_id } : {})), userData), {
+                    new: true
+                });
                 return res.json({
                     ok: true,
                     message: 'Datos actualizados correctamente',

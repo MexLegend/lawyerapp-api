@@ -39,30 +39,25 @@ class UserController {
   public async create(req: any, res: Response) {
     try {
       const {
-        address,
-        cellPhone,
-        email,
-        firstName,
-        lastName,
-        password,
-        role
+        emailAdmin: email,
+        password1: password,
+        password2: password2,
+        role,
+        ...userData
       } = req.body.user;
 
-      const userN = {
-        address,
-        cellPhone,
+      const userObject = {
         email,
-        firstName,
         img: req.body.img ? req.body.img.url : null,
         lawyers: { lawyer: req.body.lawyer ? req.body.lawyer : null },
-        lastName,
         password: hashSync(password, 10),
         public_id: req.body.img ? req.body.img.public_id : '',
         public_lawyer_id: req.body.public_lawyer_id,
-        role
+        role,
+        ...userData
       };
 
-      const user = await User.create(userN);
+      const user = await User.create(userObject);
 
       // Create Contact
       if (req.body.lawyer && role !== 'NEW') {
@@ -236,46 +231,34 @@ class UserController {
     // return;
     try {
       const { id } = req.params;
-      let userG: any = await User.findOne({ _id: id });
-      let userU;
-      let user;
+      const {
+        userImage: { url: img = null, public_id = null } = {},
+        userData
+      } = req.body;
 
-      if (req.body.img) {
+      // Remove Cloudinary User Main Image And Update It If Request Data Has Image Value
+      if (img) {
+        const userRequestData: any = await User.findById({ _id: id });
         if (
-          userG.public_id &&
-          userG.public_id !== undefined &&
-          userG.public_id !== ''
+          userRequestData.public_id &&
+          userRequestData.public_id !== undefined &&
+          userRequestData.public_id !== ''
         ) {
-          await cloudinary.v2.uploader.destroy(userG.public_id);
+          await cloudinary.v2.uploader.destroy(userRequestData.public_id);
         }
       }
-      if (req.body.user) {
-        const {
-          address,
-          biography,
-          cellPhone,
-          email,
-          firstName,
-          lastName,
-          role
-        } = req.body.user;
 
-        userU = {
-          role: role !== '' ? role : userG.role,
-          address: address !== '' ? address : userG.address,
-          biography: biography !== '' ? biography : userG.biography,
-          cellPhone: cellPhone !== '' ? cellPhone : userG.cellPhone,
-          email: email !== '' ? email : userG.email,
-          firstName: firstName !== '' ? firstName : userG.firstName,
-          lastName: lastName !== '' ? lastName : userG.lastName,
-          img: req.body.img ? req.body.img.url : userG.img,
-          public_id: req.body.img ? req.body.img.public_id : userG.public_id
-        };
-
-        user = await User.findOneAndUpdate({ _id: id }, userU, {
+      const user: any = await User.findByIdAndUpdate(
+        { _id: id },
+        {
+          ...(img ? { img } : {}),
+          ...(public_id ? { public_id } : {}),
+          ...userData
+        },
+        {
           new: true
-        });
-      }
+        }
+      );
 
       return res.json({
         ok: true,

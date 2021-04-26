@@ -1,7 +1,5 @@
 import { Router } from 'express';
-
 import emailController from '../controllers/emailCtrl';
-import { AUTH } from '../middlewares/authentication';
 
 class EmailRoutes {
     public router: Router = Router();

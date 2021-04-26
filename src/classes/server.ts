@@ -1,5 +1,5 @@
 import cors from 'cors';
-import express, { Application, response } from 'express';
+import express, { Application } from 'express';
 import http from 'http';
 import socketIO from 'socket.io';
 import { extname, join } from 'path';

@@ -1,17 +1,60 @@
 import { Request, Response } from 'express';
 import { transporter, generateMessageContent } from '../classes/mailer';
+import NewsLetter from '../models/newsLetterMdl';
+import User from '../models/userMdl';
 
 class EmailController {
+  public async newsLetterConfirmed(req: Request, res: Response) {
+    try {
+      const { idEmail } = req.params;
+
+      const emailConfirmed = await NewsLetter.findByIdAndUpdate(
+        { _id: idEmail },
+        { isConfirmed: true },
+        {
+          new: true
+        }
+      );
+
+      res.status(201).json({ ok: true, emailConfirmed });
+    } catch (err) {
+      res.status(500).json({ err, ok: false });
+    }
+  }
+
+  public async newsLetterUnsubscribe(req: Request, res: Response) {
+    try {
+      const { idEmail } = req.body;
+
+      const emailUnsubscribed = await NewsLetter.findByIdAndUpdate(
+        { _id: idEmail },
+        { status: false },
+        {
+          new: true
+        }
+      );
+
+      res.status(201).json({ ok: true, emailUnsubscribed });
+    } catch (err) {
+      res.status(500).json({ err, ok: false });
+    }
+  }
+
   public async send(req: Request, res: Response) {
     try {
       const {
         action,
-        emailContact,
+        emailSender,
+        emailReceiver,
         lawyerName,
+        link,
         messageContact,
         nameContact,
-        phoneContact
+        phoneContact,
+        subject
       } = req.body;
+
+      console.log(link);
 
       const contentHTML = `
       <div
@@ -85,8 +128,9 @@ class EmailController {
                   "
                 >
                   ${generateMessageContent(action, {
-                    emailContact,
+                    emailSender,
                     lawyerName,
+                    link,
                     messageContact,
                     nameContact,
                     phoneContact
@@ -158,9 +202,13 @@ class EmailController {
       let mailOptions = {
         from: `Haizen Abogados <armandolarae97@gmail.com>`, // sender address
         to: 'armandoskate2011@hotmail.com', // list of receivers
-        subject: 'Solicitud de evaluación de caso', // Subject line
+        subject: subject, // Subject line
         html: contentHTML
       };
+
+      // Insert a New Row/Document Into The NewsLetter Collection
+      if (action === 'confirmNewsLetter')
+        await NewsLetter.create({ email: emailSender });
 
       await transporter.sendMail(mailOptions, function (e: any, r: any) {
         if (e) {
@@ -173,7 +221,25 @@ class EmailController {
 
       res
         .status(201)
-        .json({ ok: true, nameContact, messageContact, emailContact });
+        .json({ ok: true, nameContact, messageContact, emailSender });
+    } catch (err) {
+      res.status(500).json({ err, ok: false });
+    }
+  }
+
+  public async userAccountConfirmed(req: Request, res: Response) {
+    try {
+      const { idUser } = req.params;
+
+      const accountConfirmed = await User.findByIdAndUpdate(
+        { _id: idUser },
+        { isConfirmed: true },
+        {
+          new: true
+        }
+      );
+
+      res.status(201).json({ ok: true, accountConfirmed });
     } catch (err) {
       res.status(500).json({ err, ok: false });
     }

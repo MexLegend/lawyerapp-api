@@ -8,13 +8,47 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const mailer_1 = require("../classes/mailer");
+const newsLetterMdl_1 = __importDefault(require("../models/newsLetterMdl"));
+const userMdl_1 = __importDefault(require("../models/userMdl"));
 class EmailController {
+    newsLetterConfirmed(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { idEmail } = req.params;
+                const emailConfirmed = yield newsLetterMdl_1.default.findByIdAndUpdate({ _id: idEmail }, { isConfirmed: true }, {
+                    new: true
+                });
+                res.status(201).json({ ok: true, emailConfirmed });
+            }
+            catch (err) {
+                res.status(500).json({ err, ok: false });
+            }
+        });
+    }
+    newsLetterUnsubscribe(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { idEmail } = req.body;
+                const emailUnsubscribed = yield newsLetterMdl_1.default.findByIdAndUpdate({ _id: idEmail }, { status: false }, {
+                    new: true
+                });
+                res.status(201).json({ ok: true, emailUnsubscribed });
+            }
+            catch (err) {
+                res.status(500).json({ err, ok: false });
+            }
+        });
+    }
     send(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { action, emailContact, lawyerName, messageContact, nameContact, phoneContact } = req.body;
+                const { action, emailSender, emailReceiver, lawyerName, link, messageContact, nameContact, phoneContact, subject } = req.body;
+                console.log(link);
                 const contentHTML = `
       <div
         style="
@@ -87,8 +121,9 @@ class EmailController {
                   "
                 >
                   ${mailer_1.generateMessageContent(action, {
-                    emailContact,
+                    emailSender,
                     lawyerName,
+                    link,
                     messageContact,
                     nameContact,
                     phoneContact
@@ -159,9 +194,12 @@ class EmailController {
                 let mailOptions = {
                     from: `Haizen Abogados <armandolarae97@gmail.com>`,
                     to: 'armandoskate2011@hotmail.com',
-                    subject: 'Solicitud de evaluación de caso',
+                    subject: subject,
                     html: contentHTML
                 };
+                // Insert a New Row/Document Into The NewsLetter Collection
+                if (action === 'confirmNewsLetter')
+                    yield newsLetterMdl_1.default.create({ email: emailSender });
                 yield mailer_1.transporter.sendMail(mailOptions, function (e, r) {
                     if (e) {
                         console.log(e);
@@ -173,7 +211,21 @@ class EmailController {
                 });
                 res
                     .status(201)
-                    .json({ ok: true, nameContact, messageContact, emailContact });
+                    .json({ ok: true, nameContact, messageContact, emailSender });
+            }
+            catch (err) {
+                res.status(500).json({ err, ok: false });
+            }
+        });
+    }
+    userAccountConfirmed(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { idUser } = req.params;
+                const accountConfirmed = yield userMdl_1.default.findByIdAndUpdate({ _id: idUser }, { isConfirmed: true }, {
+                    new: true
+                });
+                res.status(201).json({ ok: true, accountConfirmed });
             }
             catch (err) {
                 res.status(500).json({ err, ok: false });

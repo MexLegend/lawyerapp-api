@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateMessageContent = exports.transporter = void 0;
+const jsonwebtoken_1 = require("jsonwebtoken");
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
 const CLIENT_ID = '783095484543-0m8et20nutqgpn6gv5ohhhjjt1vc9dvm.apps.googleusercontent.com';
@@ -36,7 +37,7 @@ exports.transporter.verify().then(() => {
     console.log('Ready for send emails');
 });
 exports.generateMessageContent = (action, data) => {
-    if (action !== 'newsLetter') {
+    if (action === 'caseEvaluation' || action === 'lawyerContact') {
         return `
     <tbody>
       <tr>
@@ -252,7 +253,7 @@ exports.generateMessageContent = (action, data) => {
                             padding: 14px 0 14px 5px;
                           "
                         >
-                          ${data.emailContact}
+                          ${data.emailSender}
                         </td>
                       </tr>
                       <tr>
@@ -350,6 +351,42 @@ exports.generateMessageContent = (action, data) => {
     `;
     }
     else {
+        const SECRET = process.env.SECRET;
+        const token = jsonwebtoken_1.sign({
+            data
+        }, SECRET, {
+            expiresIn: process.env.CONFIRM_EMAIL_EXPIRATION
+        });
+        const decodedToken = jsonwebtoken_1.decode(token);
+        if (Date.now() >= decodedToken.exp * 1000)
+            console.log(false);
+        else
+            console.log(true);
+        const emailData = () => {
+            switch (action) {
+                case 'confirmNewsLetter':
+                    return {
+                        title: 'Confirma tu suscripción del boletín de Haizen',
+                        subtitle: 'Se el primero en informarte de las noticias, ofertas, actualizaciones y todo lo que estamos haciendo en Haizen Abogados.',
+                        buttonText: 'Confirmar suscripción',
+                        link: `${data.link}/${token}`
+                    };
+                case 'newsLetterConfirmed':
+                    return {
+                        title: 'Nueva suscripción al boletín de Haizen',
+                        subtitle: `Un nuevo usuario se ha suscrito con el correo <span style="font-weight: 600;">${data.emailSender}</span>.`,
+                        buttonText: 'Ver lista de correos',
+                        link: ''
+                    };
+                default:
+                    return {
+                        title: '¡Gracias por registrarte en Haizen Abogados!',
+                        subtitle: 'Para continuar, haz clic en el botón de abajo para confirmar tu cuenta.',
+                        buttonText: 'Confirmar cuenta',
+                        link: ''
+                    };
+            }
+        };
         return `
     <tbody>
       <tr>
@@ -398,28 +435,24 @@ exports.generateMessageContent = (action, data) => {
                     padding: 0;
                   "
                 >
-                  Nueva suscripción al boletín de Haizen
+                  ${emailData().title}
                 </h1>
                   <p>
-                    Un nuevo usuario se ha suscrito con el correo
-                    <span
-                      style="
-                        color: #3777b0;
-                        text-decoration: none;
-                        font-weight: 600;
-                      "
-                      >${data.emailContact}</span
-                    >.
+                  ${emailData().subtitle}
                   </p>
-                  <p>
+                  <p style="margin-top: 30px;">
                     <a
-                      href="http://localhost:4200/#/inicio"
+                      href="${emailData().link}"
                       target="_blank"
                       rel="noopener noreferrer"
                       data-auth="NotApplicable"
-                      style="color: #3777b0; text-decoration: none"
+                      style="color: white;
+                      background-color: #2e89ff;
+                      text-decoration: none;
+                      padding: 10px 15px;
+                      border-radius: 4px;"
                       data-linkindex="1"
-                      >Ver lista de correos</a
+                      >${emailData().buttonText}</a
                     >
                   </p>
                 </td>

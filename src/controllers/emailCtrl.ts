@@ -201,7 +201,7 @@ class EmailController {
 
       let mailOptions = {
         from: `Haizen Abogados <armandolarae97@gmail.com>`, // sender address
-        to: 'armandoskate2011@hotmail.com', // list of receivers
+        to: emailSender, // list of receivers
         subject: subject, // Subject line
         html: contentHTML
       };

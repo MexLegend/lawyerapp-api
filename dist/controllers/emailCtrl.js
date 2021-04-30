@@ -193,7 +193,7 @@ class EmailController {
       `;
                 let mailOptions = {
                     from: `Haizen Abogados <armandolarae97@gmail.com>`,
-                    to: 'armandoskate2011@hotmail.com',
+                    to: emailSender,
                     subject: subject,
                     html: contentHTML
                 };

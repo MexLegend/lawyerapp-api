@@ -197,8 +197,8 @@ class EmailController {
                     html: contentHTML
                 };
                 // Insert a New Row/Document Into The NewsLetter Collection
-                // if (action === 'confirmNewsLetter')
-                // await NewsLetter.create({ email: emailSender });
+                if (action === 'confirmNewsLetter')
+                    yield newsLetterMdl_1.default.create({ email: emailSender });
                 yield mailer_1.transporter.sendMail(mailOptions, function (e, r) {
                     if (e) {
                         console.log(e);

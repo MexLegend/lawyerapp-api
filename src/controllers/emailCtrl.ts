@@ -205,8 +205,8 @@ class EmailController {
       };
 
       // Insert a New Row/Document Into The NewsLetter Collection
-      // if (action === 'confirmNewsLetter')
-        // await NewsLetter.create({ email: emailSender });
+      if (action === 'confirmNewsLetter')
+        await NewsLetter.create({ email: emailSender });
 
       await transporter.sendMail(mailOptions, function (e: any, r: any) {
         if (e) {

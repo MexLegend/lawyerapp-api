@@ -30,6 +30,24 @@ class EmailController {
             }
         });
     }
+    newsLetterSubscription(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { emailSender } = req.body;
+                const emailExists = (yield newsLetterMdl_1.default.findOne({ email: emailSender })) || null;
+                // Insert a New Row/Document Into The NewsLetter Collection
+                if (emailExists === null) {
+                    yield newsLetterMdl_1.default.create({ email: emailSender });
+                    res.status(201).json({ ok: true, emailSender });
+                }
+                else
+                    res.status(201).json({ ok: false, emailSender });
+            }
+            catch (err) {
+                res.status(500).json({ err, ok: false });
+            }
+        });
+    }
     newsLetterUnsubscribe(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -196,9 +214,6 @@ class EmailController {
                     subject: subject,
                     html: contentHTML
                 };
-                // Insert a New Row/Document Into The NewsLetter Collection
-                if (action === 'confirmNewsLetter')
-                    yield newsLetterMdl_1.default.create({ email: emailSender });
                 yield mailer_1.transporter.sendMail(mailOptions, function (e, r) {
                     if (e) {
                         console.log(e);

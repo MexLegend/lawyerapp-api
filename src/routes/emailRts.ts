@@ -15,6 +15,10 @@ class EmailRoutes {
       emailController.newsLetterConfirmed
     );
     this.router.post(
+      '/newsLetter/subscription',
+      emailController.newsLetterSubscription
+    );
+    this.router.post(
       '/user/confirm/:token',
       emailController.userAccountConfirmed
     );

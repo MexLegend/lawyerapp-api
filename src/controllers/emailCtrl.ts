@@ -22,6 +22,23 @@ class EmailController {
     }
   }
 
+  public async newsLetterSubscription(req: Request, res: Response) {
+    try {
+      const { emailSender } = req.body;
+
+      const emailExists =
+        (await NewsLetter.findOne({ email: emailSender })) || null;
+
+      // Insert a New Row/Document Into The NewsLetter Collection
+      if (emailExists === null) {
+        await NewsLetter.create({ email: emailSender });
+        res.status(201).json({ ok: true, emailSender });
+      } else res.status(201).json({ ok: false, emailSender });
+    } catch (err) {
+      res.status(500).json({ err, ok: false });
+    }
+  }
+
   public async newsLetterUnsubscribe(req: Request, res: Response) {
     try {
       const { idEmail } = req.body;
@@ -203,10 +220,6 @@ class EmailController {
         subject: subject, // Subject line
         html: contentHTML
       };
-
-      // Insert a New Row/Document Into The NewsLetter Collection
-      if (action === 'confirmNewsLetter')
-        await NewsLetter.create({ email: emailSender });
 
       await transporter.sendMail(mailOptions, function (e: any, r: any) {
         if (e) {

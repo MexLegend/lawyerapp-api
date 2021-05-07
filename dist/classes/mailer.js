@@ -16,7 +16,7 @@ const { google } = require('googleapis');
 const CLIENT_ID = '783095484543-0m8et20nutqgpn6gv5ohhhjjt1vc9dvm.apps.googleusercontent.com';
 const CLIENT_SECRET = 'yUJ6ewqa6NV6dh3Ao1ZircGR';
 const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
-const REFRESH_TOKEN = '1//04piBd1fZzXMACgYIARAAGAQSNwF-L9Irr2PBfbU6QX9KELAc1v4RZBw3nS-hVlb-89_05BR5E54P5FsdoeMTG_Lm3Vw7gfLgd3M';
+const REFRESH_TOKEN = '1//04-92yj7nWTK4CgYIARAAGAQSNwF-L9Ir1Regg05AdSCYr0Yfvixqmt_HuTmkcrjwJ2QB1_ImOTlJTF1xPGZxeg0MjVAmDCH_CJc';
 const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
 oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 const accessToken = () => __awaiter(void 0, void 0, void 0, function* () { return yield oAuth2Client.getAccessToken(); });
@@ -376,14 +376,14 @@ exports.generateMessageContent = (action, data) => {
                         title: 'Nueva suscripción al boletín de Haizen',
                         subtitle: `Un nuevo usuario se ha suscrito con el correo <span style="font-weight: 600;">${data.emailSender}</span>.`,
                         buttonText: 'Ver lista de correos',
-                        link: ''
+                        link: `${data.link}/${token}`
                     };
                 default:
                     return {
                         title: '¡Gracias por registrarte en Haizen Abogados!',
                         subtitle: 'Para continuar, haz clic en el botón de abajo para confirmar tu cuenta.',
                         buttonText: 'Confirmar cuenta',
-                        link: ''
+                        link: `${data.link}/${token}`
                     };
             }
         };

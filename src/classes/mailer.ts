@@ -7,7 +7,7 @@ const CLIENT_ID =
 const CLIENT_SECRET = 'yUJ6ewqa6NV6dh3Ao1ZircGR';
 const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
 const REFRESH_TOKEN =
-  '1//04piBd1fZzXMACgYIARAAGAQSNwF-L9Irr2PBfbU6QX9KELAc1v4RZBw3nS-hVlb-89_05BR5E54P5FsdoeMTG_Lm3Vw7gfLgd3M';
+  '1//04-92yj7nWTK4CgYIARAAGAQSNwF-L9Ir1Regg05AdSCYr0Yfvixqmt_HuTmkcrjwJ2QB1_ImOTlJTF1xPGZxeg0MjVAmDCH_CJc';
 
 const oAuth2Client = new google.auth.OAuth2(
   CLIENT_ID,
@@ -386,7 +386,7 @@ export const generateMessageContent = (action: string, data: any) => {
             title: 'Nueva suscripción al boletín de Haizen',
             subtitle: `Un nuevo usuario se ha suscrito con el correo <span style="font-weight: 600;">${data.emailSender}</span>.`,
             buttonText: 'Ver lista de correos',
-            link: ''
+            link: `${data.link}/${token}`
           };
 
         default:
@@ -395,7 +395,7 @@ export const generateMessageContent = (action: string, data: any) => {
             subtitle:
               'Para continuar, haz clic en el botón de abajo para confirmar tu cuenta.',
             buttonText: 'Confirmar cuenta',
-            link: ''
+            link: `${data.link}/${token}`
           };
       }
     };

@@ -16,23 +16,25 @@ const bcryptjs_1 = require("bcryptjs");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const userMdl_1 = __importDefault(require("../models/userMdl"));
 exports.default = {
-    // Allows Users To Loggin In The System
+    // Allow Users To Loggin In The System
     login(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const body = req.body;
+                const userData = req.body;
                 const user = yield userMdl_1.default.findOne({
-                    email: body.email
+                    email: userData.email
                 });
+                // Emails Doesn't Exist
                 if (!user) {
-                    return res.status(400).json({
-                        message: '(Usuario) o contraseña incorrecto',
+                    return res.json({
+                        type: 'notExist',
                         ok: false
                     });
                 }
-                if (!bcryptjs_1.compareSync(body.password, user.password)) {
-                    return res.status(404).json({
-                        message: 'Usuario o (contraseña) incorrecto',
+                // Wrong Credentials
+                if (!bcryptjs_1.compareSync(userData.password, user.password)) {
+                    return res.json({
+                        type: 'wrongCredentials',
                         ok: false
                     });
                 }

@@ -62,11 +62,11 @@ class UserController {
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const _a = req.body.user, { emailAdmin: email, password1: password, password2: password2, role } = _a, userData = __rest(_a, ["emailAdmin", "password1", "password2", "role"]);
-                const userObject = Object.assign({ email, img: req.body.img ? req.body.img.url : null, lawyers: { lawyer: req.body.lawyer ? req.body.lawyer : null }, password: bcryptjs_1.hashSync(password, 10), public_id: req.body.img ? req.body.img.public_id : '', public_lawyer_id: req.body.public_lawyer_id, role }, userData);
+                const _a = req.body.user, { email, password1: password, password2: password2 } = _a, userData = __rest(_a, ["email", "password1", "password2"]);
+                const userObject = Object.assign({ email, img: req.body.img ? req.body.img.url : null, lawyers: req.body.lawyer ? req.body.lawyer : [], password: bcryptjs_1.hashSync(password, 10), public_id: req.body.img ? req.body.img.public_id : '', public_lawyer_id: req.body.public_lawyer_id }, userData);
                 const user = yield userMdl_1.default.create(userObject);
                 // Create Contact
-                if (req.body.lawyer && role !== 'NEW') {
+                if (req.body.lawyer) {
                     // Add Client Contact To Lawyer Contacts List
                     yield contactMdl_1.default.findOneAndUpdate({
                         user: req.body.lawyer

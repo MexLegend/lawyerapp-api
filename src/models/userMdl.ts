@@ -38,6 +38,10 @@ const userModel = new Schema({
     type: String,
     required: false
   },
+  isConfirmed: {
+    type: Boolean,
+    default: false
+  },
   lastName: {
     type: String,
     required: [true, 'Los Apellidos son requeridos']
@@ -46,9 +50,9 @@ const userModel = new Schema({
     {
       lawyer: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: false
-      }
+        ref: 'User'
+      },
+      required: false
     }
   ],
   password: {
@@ -57,7 +61,8 @@ const userModel = new Schema({
   },
   practice_areas: [
     {
-      practice_area: { type: Schema.Types.ObjectId, ref: 'PracticeArea' }
+      practice_area: { type: Schema.Types.ObjectId, ref: 'PracticeArea' },
+      required: false
     }
   ],
   public_id: {
@@ -82,7 +87,8 @@ const userModel = new Schema({
       type: {
         type: String,
         default: 'Personal'
-      }
+      },
+      required: false
     }
   ],
   status: {

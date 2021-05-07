@@ -13,6 +13,7 @@ class EmailRoutes {
     config() {
         this.router.post('/', emailCtrl_1.default.send);
         this.router.post('/newsLetter/confirm/:token', emailCtrl_1.default.newsLetterConfirmed);
+        this.router.post('/newsLetter/subscription', emailCtrl_1.default.newsLetterSubscription);
         this.router.post('/user/confirm/:token', emailCtrl_1.default.userAccountConfirmed);
     }
 }

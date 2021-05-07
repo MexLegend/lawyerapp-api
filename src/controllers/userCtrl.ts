@@ -39,28 +39,26 @@ class UserController {
   public async create(req: any, res: Response) {
     try {
       const {
-        emailAdmin: email,
+        email,
         password1: password,
         password2: password2,
-        role,
         ...userData
       } = req.body.user;
 
       const userObject = {
         email,
         img: req.body.img ? req.body.img.url : null,
-        lawyers: { lawyer: req.body.lawyer ? req.body.lawyer : null },
+        lawyers: req.body.lawyer ? req.body.lawyer : [],
         password: hashSync(password, 10),
         public_id: req.body.img ? req.body.img.public_id : '',
         public_lawyer_id: req.body.public_lawyer_id,
-        role,
         ...userData
       };
 
       const user = await User.create(userObject);
 
       // Create Contact
-      if (req.body.lawyer && role !== 'NEW') {
+      if (req.body.lawyer) {
         // Add Client Contact To Lawyer Contacts List
         await Contact.findOneAndUpdate(
           {

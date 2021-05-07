@@ -5,25 +5,27 @@ import { sign } from 'jsonwebtoken';
 import User from '../models/userMdl';
 
 export default {
-  // Allows Users To Loggin In The System
+  // Allow Users To Loggin In The System
   async login(req: any, res: Response) {
     try {
-      const body = req.body;
+      const userData = req.body;
 
       const user: any = await User.findOne({
-        email: body.email
+        email: userData.email
       });
 
+      // Emails Doesn't Exist
       if (!user) {
-        return res.status(400).json({
-          message: '(Usuario) o contraseña incorrecto',
+        return res.json({
+          type: 'notExist',
           ok: false
         });
       }
 
-      if (!compareSync(body.password, user.password)) {
-        return res.status(404).json({
-          message: 'Usuario o (contraseña) incorrecto',
+      // Wrong Credentials
+      if (!compareSync(userData.password, user.password)) {
+        return res.json({
+          type: 'wrongCredentials',
           ok: false
         });
       }

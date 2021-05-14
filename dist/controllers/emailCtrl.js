@@ -65,7 +65,7 @@ class EmailController {
     send(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { action, emailSender, emailReceiver, lawyerName, link, messageContact, nameContact, phoneContact, subject } = req.body;
+                const { action, emailSender, emailReceiver, lawyerName, link, messageContact, nameContact, phoneContact, subject, id } = req.body;
                 const contentHTML = `
       <div
         style="
@@ -143,7 +143,8 @@ class EmailController {
                     link,
                     messageContact,
                     nameContact,
-                    phoneContact
+                    phoneContact,
+                    id
                 })}
                 </table>
               </td>

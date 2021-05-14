@@ -16,7 +16,7 @@ const { google } = require('googleapis');
 const CLIENT_ID = '783095484543-0m8et20nutqgpn6gv5ohhhjjt1vc9dvm.apps.googleusercontent.com';
 const CLIENT_SECRET = 'yUJ6ewqa6NV6dh3Ao1ZircGR';
 const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
-const REFRESH_TOKEN = '1//04-92yj7nWTK4CgYIARAAGAQSNwF-L9Ir1Regg05AdSCYr0Yfvixqmt_HuTmkcrjwJ2QB1_ImOTlJTF1xPGZxeg0MjVAmDCH_CJc';
+const REFRESH_TOKEN = '1//04XCTNb-a1aKbCgYIARAAGAQSNwF-L9IrATGLa73npJSGQfkOLJCzT-MdidLIz9HmsBGF0gjHz6mwsMeeNHRrFGYza1Gi-6ddneY';
 const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
 oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 const accessToken = () => __awaiter(void 0, void 0, void 0, function* () { return yield oAuth2Client.getAccessToken(); });
@@ -352,16 +352,9 @@ exports.generateMessageContent = (action, data) => {
     }
     else {
         const SECRET = process.env.SECRET;
-        const token = jsonwebtoken_1.sign({
-            data
-        }, SECRET, {
+        const token = jsonwebtoken_1.sign(Object.assign(Object.assign({}, data), { action }), SECRET, {
             expiresIn: process.env.CONFIRM_EMAIL_EXPIRATION
         });
-        const decodedToken = jsonwebtoken_1.decode(token);
-        if (Date.now() >= decodedToken.exp * 1000)
-            console.log(false);
-        else
-            console.log(true);
         const emailData = () => {
             switch (action) {
                 case 'confirmNewsLetter':
@@ -369,21 +362,31 @@ exports.generateMessageContent = (action, data) => {
                         title: 'Confirma tu suscripción del boletín de Haizen',
                         subtitle: 'Se el primero en informarte de las noticias, ofertas, actualizaciones y todo lo que estamos haciendo en Haizen Abogados.',
                         buttonText: 'Confirmar suscripción',
-                        link: `${data.link}/${token}`
+                        link: `${data.link}?token=${token}`
                     };
                 case 'newsLetterConfirmed':
                     return {
                         title: 'Nueva suscripción al boletín de Haizen',
                         subtitle: `Un nuevo usuario se ha suscrito con el correo <span style="font-weight: 600;">${data.emailSender}</span>.`,
                         buttonText: 'Ver lista de correos',
-                        link: `${data.link}/${token}`
+                        link: `${data.link}?token=${token}`
+                    };
+                case 'recoverAccount':
+                    return {
+                        title: `Hola, ${data.nameContact}:`,
+                        subtitle: ` 
+            <p style="text-align: left; line-height: 24px">Hemos recibido una solicitud para restablecer la contraseña de tu cuenta de Haizen. 
+            Utiliza el botón siguiente para hacerlo. Si no solicitaste restablecer la contraseña, puedes 
+            ignorar este mensaje.</p>`,
+                        buttonText: 'Restablece tu contraseña',
+                        link: `${data.link}?token=${token}`
                     };
                 default:
                     return {
                         title: '¡Gracias por registrarte en Haizen Abogados!',
-                        subtitle: 'Para continuar, haz clic en el botón de abajo para confirmar tu cuenta.',
-                        buttonText: 'Confirmar cuenta',
-                        link: `${data.link}/${token}`
+                        subtitle: 'Para continuar, haz clic en el botón de abajo para verificar tu cuenta.',
+                        buttonText: 'Verificar cuenta',
+                        link: `${data.link}?token=${token}`
                     };
             }
         };

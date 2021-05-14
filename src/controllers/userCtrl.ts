@@ -431,6 +431,56 @@ class UserController {
     }
   }
 
+  // Update The Password From One Row/Document Of Users Collection
+  public async updatePassDirectly(req: any, res: Response) {
+    try {
+      const { id } = req.params;
+      const { password, confirmPassword } = req.body;
+      const passHash = hashSync(password, 10);
+
+      console.log(id);
+
+      if (password && confirmPassword) {
+        if (password === confirmPassword) {
+          if (password.length > 8) {
+            const user = await User.findOneAndUpdate(
+              { _id: id },
+              { password: passHash },
+              {
+                new: true
+              }
+            );
+
+            return res.json({
+              message: 'Contraseña actualizada correctamente',
+              ok: true,
+              user
+            });
+          } else {
+            return res.json({
+              message: 'La contraseña debe tener al menos 9 caracteres',
+              ok: false
+            });
+          }
+        } else {
+          return res.json({
+            message: 'Las contraseñas no coinciden',
+            ok: false
+          });
+        }
+      } else {
+        return res.json({
+          message: 'La contraseña es requerida',
+          ok: false
+        });
+      }
+    } catch (err) {
+      res
+        .status(500)
+        .json({ err, message: 'Ocurrió un error en el sistema', ok: false });
+    }
+  }
+
   // Update The Rol From One Row/Document Of Users Collection
   public async updateRol(req: any, res: Response) {
     try {
@@ -455,6 +505,32 @@ class UserController {
         ok: false,
         message: 'Error al actualizar el Rol del Usuario'
       });
+    }
+  }
+
+  // Validate If An User Email Is Used Already
+  public async validateEmailExists(req: any, res: Response) {
+    try {
+      const { email } = req.body;
+
+      const user: any = await User.findOne({
+        email: email
+      });
+
+      if (!user) {
+        return res.json({
+          ok: false,
+          exist: false,
+          message: 'Correo no registrado',
+          user
+        });
+      } else {
+        return res.json({ ok: true, exist: true, user });
+      }
+    } catch (err) {
+      res
+        .status(500)
+        .json({ err, ok: false, message: 'Error al encontrar usuario' });
     }
   }
 }

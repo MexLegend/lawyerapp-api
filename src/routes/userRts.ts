@@ -13,6 +13,10 @@ class UserRoutes {
   config(): void {
     this.router.post('/', userController.create);
     this.router.post('/check/email', userController.checkEmail);
+    this.router.post(
+      '/validate-email-exists',
+      userController.validateEmailExists
+    );
     this.router.get('/', [AUTH.verifyToken], userController.get);
     this.router.get('/lawyers', userController.getLawyers);
     this.router.get('/lawyer/:id', userController.getLawyer);
@@ -34,6 +38,10 @@ class UserRoutes {
       '/change-pass/:id',
       [AUTH.verifyToken, AUTH.verifyAdminAssociated],
       userController.updatePass
+    );
+    this.router.put(
+      '/change-pass-directly/:id',
+      userController.updatePassDirectly
     );
     this.router.put(
       '/rol/:id',

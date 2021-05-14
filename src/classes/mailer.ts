@@ -1,4 +1,4 @@
-import { decode, sign } from 'jsonwebtoken';
+import { sign } from 'jsonwebtoken';
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
 
@@ -7,7 +7,7 @@ const CLIENT_ID =
 const CLIENT_SECRET = 'yUJ6ewqa6NV6dh3Ao1ZircGR';
 const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
 const REFRESH_TOKEN =
-  '1//04-92yj7nWTK4CgYIARAAGAQSNwF-L9Ir1Regg05AdSCYr0Yfvixqmt_HuTmkcrjwJ2QB1_ImOTlJTF1xPGZxeg0MjVAmDCH_CJc';
+  '1//04XCTNb-a1aKbCgYIARAAGAQSNwF-L9IrATGLa73npJSGQfkOLJCzT-MdidLIz9HmsBGF0gjHz6mwsMeeNHRrFGYza1Gi-6ddneY';
 
 const oAuth2Client = new google.auth.OAuth2(
   CLIENT_ID,
@@ -357,18 +357,14 @@ export const generateMessageContent = (action: string, data: any) => {
     const SECRET: any = process.env.SECRET;
     const token = sign(
       {
-        data
+        ...data,
+        action
       },
       SECRET,
       {
         expiresIn: process.env.CONFIRM_EMAIL_EXPIRATION
       }
     );
-
-    const decodedToken: any = decode(token);
-
-    if (Date.now() >= decodedToken.exp * 1000) console.log(false);
-    else console.log(true);
 
     const emailData = () => {
       switch (action) {
@@ -378,7 +374,7 @@ export const generateMessageContent = (action: string, data: any) => {
             subtitle:
               'Se el primero en informarte de las noticias, ofertas, actualizaciones y todo lo que estamos haciendo en Haizen Abogados.',
             buttonText: 'Confirmar suscripción',
-            link: `${data.link}/${token}`
+            link: `${data.link}?token=${token}`
           };
 
         case 'newsLetterConfirmed':
@@ -386,16 +382,27 @@ export const generateMessageContent = (action: string, data: any) => {
             title: 'Nueva suscripción al boletín de Haizen',
             subtitle: `Un nuevo usuario se ha suscrito con el correo <span style="font-weight: 600;">${data.emailSender}</span>.`,
             buttonText: 'Ver lista de correos',
-            link: `${data.link}/${token}`
+            link: `${data.link}?token=${token}`
+          };
+
+        case 'recoverAccount':
+          return {
+            title: `Hola, ${data.nameContact}:`,
+            subtitle: ` 
+            <p style="text-align: left; line-height: 24px">Hemos recibido una solicitud para restablecer la contraseña de tu cuenta de Haizen. 
+            Utiliza el botón siguiente para hacerlo. Si no solicitaste restablecer la contraseña, puedes 
+            ignorar este mensaje.</p>`,
+            buttonText: 'Restablece tu contraseña',
+            link: `${data.link}?token=${token}`
           };
 
         default:
           return {
             title: '¡Gracias por registrarte en Haizen Abogados!',
             subtitle:
-              'Para continuar, haz clic en el botón de abajo para confirmar tu cuenta.',
-            buttonText: 'Confirmar cuenta',
-            link: `${data.link}/${token}`
+              'Para continuar, haz clic en el botón de abajo para verificar tu cuenta.',
+            buttonText: 'Verificar cuenta',
+            link: `${data.link}?token=${token}`
           };
       }
     };

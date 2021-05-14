@@ -68,7 +68,8 @@ class EmailController {
         messageContact,
         nameContact,
         phoneContact,
-        subject
+        subject,
+        id
       } = req.body;
 
       const contentHTML = `
@@ -148,7 +149,8 @@ class EmailController {
                     link,
                     messageContact,
                     nameContact,
-                    phoneContact
+                    phoneContact,
+                    id
                   })}
                 </table>
               </td>

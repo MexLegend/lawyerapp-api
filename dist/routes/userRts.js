@@ -14,6 +14,7 @@ class UserRoutes {
     config() {
         this.router.post('/', userCtrl_1.default.create);
         this.router.post('/check/email', userCtrl_1.default.checkEmail);
+        this.router.post('/validate-email-exists', userCtrl_1.default.validateEmailExists);
         this.router.get('/', [authentication_1.AUTH.verifyToken], userCtrl_1.default.get);
         this.router.get('/lawyers', userCtrl_1.default.getLawyers);
         this.router.get('/lawyer/:id', userCtrl_1.default.getLawyer);
@@ -22,6 +23,7 @@ class UserRoutes {
         this.router.put('/user-data/:id', [authentication_1.AUTH.verifyToken], userCtrl_1.default.updateUserData);
         this.router.put('/image/:id', [authentication_1.AUTH.verifyToken, authentication_1.AUTH.verifyAdminSameUser], userCtrl_1.default.updateImage);
         this.router.put('/change-pass/:id', [authentication_1.AUTH.verifyToken, authentication_1.AUTH.verifyAdminAssociated], userCtrl_1.default.updatePass);
+        this.router.put('/change-pass-directly/:id', userCtrl_1.default.updatePassDirectly);
         this.router.put('/rol/:id', [authentication_1.AUTH.verifyToken, authentication_1.AUTH.verifyAdmin], userCtrl_1.default.updateRol);
         this.router.delete('/:id', [authentication_1.AUTH.verifyToken, authentication_1.AUTH.verifyAdminAssociated], userCtrl_1.default.delete);
     }

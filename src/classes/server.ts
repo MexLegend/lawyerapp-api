@@ -42,6 +42,7 @@ import whatsappRoutes from '../routes/whatsappRts';
 import chatRoutes from '../routes/chatRts';
 import contactRoutes from '../routes/contactRts';
 import practiceAreaRoutes from '../routes/practiceAreaRts';
+import utilitiesRoutes from '../routes/utilitiesRts';
 
 export default class Server {
   private static _instance: Server;
@@ -132,6 +133,7 @@ export default class Server {
     this.app.use('/api/practice-areas', practiceAreaRoutes);
     this.app.use('/api/trackings', trackingRoutes);
     this.app.use('/api/users', userRoutes);
+    this.app.use('/api/utilities', utilitiesRoutes);
     this.app.use('/api/volumes', volumeRoutes);
     this.app.use('/api/whatsapp', whatsappRoutes);
   }

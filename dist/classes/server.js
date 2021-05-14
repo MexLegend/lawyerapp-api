@@ -62,6 +62,7 @@ const whatsappRts_1 = __importDefault(require("../routes/whatsappRts"));
 const chatRts_1 = __importDefault(require("../routes/chatRts"));
 const contactRts_1 = __importDefault(require("../routes/contactRts"));
 const practiceAreaRts_1 = __importDefault(require("../routes/practiceAreaRts"));
+const utilitiesRts_1 = __importDefault(require("../routes/utilitiesRts"));
 class Server {
     constructor() {
         this.app = express_1.default();
@@ -126,6 +127,7 @@ class Server {
         this.app.use('/api/practice-areas', practiceAreaRts_1.default);
         this.app.use('/api/trackings', trackingRts_1.default);
         this.app.use('/api/users', userRts_1.default);
+        this.app.use('/api/utilities', utilitiesRts_1.default);
         this.app.use('/api/volumes', volumeRts_1.default);
         this.app.use('/api/whatsapp', whatsappRts_1.default);
     }

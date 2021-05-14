@@ -397,6 +397,54 @@ class UserController {
             }
         });
     }
+    // Update The Password From One Row/Document Of Users Collection
+    updatePassDirectly(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id } = req.params;
+                const { password, confirmPassword } = req.body;
+                const passHash = bcryptjs_1.hashSync(password, 10);
+                console.log(id);
+                if (password && confirmPassword) {
+                    if (password === confirmPassword) {
+                        if (password.length > 8) {
+                            const user = yield userMdl_1.default.findOneAndUpdate({ _id: id }, { password: passHash }, {
+                                new: true
+                            });
+                            return res.json({
+                                message: 'Contraseña actualizada correctamente',
+                                ok: true,
+                                user
+                            });
+                        }
+                        else {
+                            return res.json({
+                                message: 'La contraseña debe tener al menos 9 caracteres',
+                                ok: false
+                            });
+                        }
+                    }
+                    else {
+                        return res.json({
+                            message: 'Las contraseñas no coinciden',
+                            ok: false
+                        });
+                    }
+                }
+                else {
+                    return res.json({
+                        message: 'La contraseña es requerida',
+                        ok: false
+                    });
+                }
+            }
+            catch (err) {
+                res
+                    .status(500)
+                    .json({ err, message: 'Ocurrió un error en el sistema', ok: false });
+            }
+        });
+    }
     // Update The Rol From One Row/Document Of Users Collection
     updateRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -417,6 +465,33 @@ class UserController {
                     ok: false,
                     message: 'Error al actualizar el Rol del Usuario'
                 });
+            }
+        });
+    }
+    // Validate If An User Email Is Used Already
+    validateEmailExists(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { email } = req.body;
+                const user = yield userMdl_1.default.findOne({
+                    email: email
+                });
+                if (!user) {
+                    return res.json({
+                        ok: false,
+                        exist: false,
+                        message: 'Correo no registrado',
+                        user
+                    });
+                }
+                else {
+                    return res.json({ ok: true, exist: true, user });
+                }
+            }
+            catch (err) {
+                res
+                    .status(500)
+                    .json({ err, ok: false, message: 'Error al encontrar usuario' });
             }
         });
     }

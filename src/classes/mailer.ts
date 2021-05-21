@@ -7,7 +7,7 @@ const CLIENT_ID =
 const CLIENT_SECRET = 'yUJ6ewqa6NV6dh3Ao1ZircGR';
 const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
 const REFRESH_TOKEN =
-  '1//04XCTNb-a1aKbCgYIARAAGAQSNwF-L9IrATGLa73npJSGQfkOLJCzT-MdidLIz9HmsBGF0gjHz6mwsMeeNHRrFGYza1Gi-6ddneY';
+  '1//04Zn-bs5obBK8CgYIARAAGAQSNwF-L9Irxa-tDT0-ggbAc3TYFjh7aFpBNP28g8Ujx30CiLROZRvk36igMWAXwk1LnFy8YqTQF40';
 
 const oAuth2Client = new google.auth.OAuth2(
   CLIENT_ID,
@@ -42,7 +42,6 @@ export const generateMessageContent = (action: string, data: any) => {
     <tbody>
       <tr>
         <td
-          class="x_wrapper-cell"
           align="left"
           bgcolor="#fff"
           style="
@@ -55,9 +54,6 @@ export const generateMessageContent = (action: string, data: any) => {
         >
           <table
             border="0"
-            cellpadding="0"
-            cellspacing="0"
-            class="x_content"
             style="
               width: 100%;
               border-collapse: separate;
@@ -66,7 +62,7 @@ export const generateMessageContent = (action: string, data: any) => {
           >
             <tbody>
               <!-- Header Text -->
-              <tr class="x_alert">
+              <tr>
                 <td
                   align="center"
                   bgcolor="#2e89ff"
@@ -83,9 +79,6 @@ export const generateMessageContent = (action: string, data: any) => {
                 >
                   <table
                     border="0"
-                    cellpadding="0"
-                    cellspacing="0"
-                    class="x_img"
                     style="border-collapse: collapse; margin: 0 auto"
                   >
                     <tbody>
@@ -113,7 +106,7 @@ export const generateMessageContent = (action: string, data: any) => {
                 </td>
               </tr>
               <!-- Spacer -->
-              <tr class="x_spacer">
+              <tr>
                 <td
                   style="
                     font-family: 'Helvetica Neue', Helvetica, Arial,
@@ -127,7 +120,7 @@ export const generateMessageContent = (action: string, data: any) => {
                 </td>
               </tr>
               <!-- Text Paragraph -->
-              <tr class="x_section">
+              <tr>
                 <td
                   align="center"
                   style="
@@ -140,9 +133,6 @@ export const generateMessageContent = (action: string, data: any) => {
                 >
                   <table
                     border="0"
-                    cellpadding="0"
-                    cellspacing="0"
-                    class="x_img"
                     style="border-collapse: collapse; width: 100%"
                   >
                     <tbody>
@@ -177,7 +167,7 @@ export const generateMessageContent = (action: string, data: any) => {
                 </td>
               </tr>
               <!-- User Details Table  -->
-              <tr class="x_section">
+              <tr>
                 <td
                   style="
                     font-family: 'Helvetica Neue', Helvetica, Arial,
@@ -190,9 +180,6 @@ export const generateMessageContent = (action: string, data: any) => {
                 >
                   <table
                     border="0"
-                    cellpadding="0"
-                    cellspacing="0"
-                    class="x_info"
                     style="width: 100%"
                   >
                     <tbody>
@@ -293,7 +280,6 @@ export const generateMessageContent = (action: string, data: any) => {
                           "
                         >
                           <span
-                            class="x_muted"
                             style="
                               color: #333333;
                               text-decoration: none;
@@ -357,7 +343,7 @@ export const generateMessageContent = (action: string, data: any) => {
     const SECRET: any = process.env.SECRET;
     const token = sign(
       {
-        ...data,
+        id: data.id,
         action
       },
       SECRET,
@@ -411,7 +397,6 @@ export const generateMessageContent = (action: string, data: any) => {
     <tbody>
       <tr>
         <td
-          class="x_wrapper-cell"
           align="left"
           bgcolor="#ffffff"
           style="
@@ -424,15 +409,11 @@ export const generateMessageContent = (action: string, data: any) => {
         >
           <table
             border="0"
-            cellpadding="0"
-            cellspacing="0"
-            class="x_content"
             style="width: 100%; border-collapse: separate; border-spacing: 0"
           >
             <tbody>
               <tr>
                 <td
-                  class="x_text-content"
                   align="center"
                   style="
                     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;

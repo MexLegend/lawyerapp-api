@@ -35,6 +35,35 @@ class UserController {
     }
   }
 
+  // Confirm Account From One Row/Document Of Users Collection
+  public async confirmAccount(req: any, res: Response) {
+    try {
+      console.log("Hola");
+
+      return;
+
+      const { id } = req.body;
+
+      const user = await User.findOneAndUpdate(
+        { _id: id },
+        { isConfirmed: true },
+        {
+          new: true
+        }
+      );
+
+      return res.json({
+        message: 'Cuenta confirmada correctamente',
+        ok: true,
+        user
+      });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ err, message: 'Ocurrió un error en el sistema', ok: false });
+    }
+  }
+
   // Insert a New Row/Document Into The Users Collection
   public async create(req: any, res: Response) {
     try {

@@ -1,5 +1,7 @@
 import { Response } from 'express';
-import { decode, verify } from 'jsonwebtoken';
+import { verify, decode } from 'jsonwebtoken';
+import NewsLetter from '../models/newsLetterMdl';
+import User from '../models/userMdl';
 
 class UtilitiesController {
   // Check Token Expiration
@@ -10,17 +12,62 @@ class UtilitiesController {
 
       verify(token, SECRET, (err: any, decoded: any) => {
         if (err) {
-          return res.json({
-            err,
-            message: 'Token no válido',
-            ok: false
-          });
+          const decodedToken: any = decode(token);
+
+          const responseData = async () => {
+            if (decodedToken.action === 'confirmNewsLetter') {
+              return await NewsLetter.findById({ _id: decodedToken.id });
+            } else {
+              return await User.findById({ _id: decodedToken.id });
+            }
+          };
+
+          responseData().then((resp: any) =>
+            res.json({
+              err,
+              ok: false,
+              message: 'Token no válido',
+              responseData: { ...resp._doc, action: decodedToken.action },
+              tokenExpired: true
+            })
+          );
         } else {
-          return res.json({ ok: true, decoded });
+          const responseData = async () => {
+            switch (decoded.action) {
+              case 'confirmAccount':
+                return await User.findOneAndUpdate(
+                  { _id: decoded.id },
+                  { isConfirmed: true },
+                  {
+                    new: true
+                  }
+                );
+              case 'confirmNewsLetter':
+                return await NewsLetter.findOneAndUpdate(
+                  { _id: decoded.id },
+                  { isConfirmed: true },
+                  {
+                    new: true
+                  }
+                );
+              default:
+                return { id: decoded.id };
+                break;
+            }
+          };
+
+          responseData()
+            .then((resp) => res.json({ ok: true, responseData: resp }))
+            .catch(() => res.json({ ok: false, tokenExpired: false }));
         }
       });
     } catch (err) {
-      res.status(500).json({ err, ok: false });
+      res.status(500).json({
+        err,
+        message: 'Ocurrió un error en el sistema',
+        tokenExpired: false,
+        ok: false
+      });
     }
   }
 }

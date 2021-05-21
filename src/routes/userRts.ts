@@ -27,13 +27,12 @@ class UserRoutes {
       [AUTH.verifyToken],
       userController.updateUserData
     );
-
+    this.router.put('/confirm-account', userController.confirmAccount);
     this.router.put(
       '/image/:id',
       [AUTH.verifyToken, AUTH.verifyAdminSameUser],
       userController.updateImage
     );
-
     this.router.put(
       '/change-pass/:id',
       [AUTH.verifyToken, AUTH.verifyAdminAssociated],

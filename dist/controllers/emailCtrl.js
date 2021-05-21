@@ -37,8 +37,8 @@ class EmailController {
                 const emailExists = (yield newsLetterMdl_1.default.findOne({ email: emailSender })) || null;
                 // Insert a New Row/Document Into The NewsLetter Collection
                 if (emailExists === null) {
-                    yield newsLetterMdl_1.default.create({ email: emailSender });
-                    res.status(201).json({ ok: true, emailSender });
+                    const newsLetter = yield newsLetterMdl_1.default.create({ email: emailSender });
+                    res.status(201).json({ ok: true, emailSender, newsLetter });
                 }
                 else
                     res.status(201).json({ ok: false, emailSender });
@@ -83,7 +83,6 @@ class EmailController {
           border="0"
           cellpadding="0"
           cellspacing="0"
-          id="x_body"
           bgcolor="#fafafa"
           style="
             text-align: center;
@@ -94,7 +93,7 @@ class EmailController {
           "
         >
           <tbody>
-            <tr class="x_line">
+            <tr>
               <td
                 bgcolor="#2e89ff"
                 style="
@@ -105,7 +104,7 @@ class EmailController {
                 "
               ></td>
             </tr>
-            <tr class="x_header">
+            <tr>
               <td
                 style="
                   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -129,7 +128,6 @@ class EmailController {
                   border="0"
                   cellpadding="0"
                   cellspacing="0"
-                  class="x_wrapper"
                   style="
                     width: 640px;
                     border-collapse: separate;
@@ -149,7 +147,7 @@ class EmailController {
                 </table>
               </td>
             </tr>
-            <tr class="x_footer">
+            <tr>
               <td
                 style="
                   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -174,7 +172,6 @@ class EmailController {
                     target="_blank"
                     rel="noopener noreferrer"
                     data-auth="NotApplicable"
-                    class="x_mng-notif-link"
                     style="color: #3777b0; text-decoration: none"
                     data-linkindex="2"
                     >Gestionar las notificaciones</a
@@ -185,7 +182,6 @@ class EmailController {
                     target="_blank"
                     rel="noopener noreferrer"
                     data-auth="NotApplicable"
-                    class="x_help-link"
                     style="color: #3777b0; text-decoration: none"
                     data-linkindex="3"
                     >Ayuda</a
@@ -195,7 +191,6 @@ class EmailController {
             </tr>
             <tr>
               <td
-                class="x_footer-message"
                 style="
                   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
                   font-size: 13px;

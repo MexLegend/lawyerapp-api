@@ -18,7 +18,8 @@ export default {
       if (!user) {
         return res.json({
           type: 'notExist',
-          ok: false
+          ok: false,
+          user
         });
       }
 
@@ -26,7 +27,17 @@ export default {
       if (!compareSync(userData.password, user.password)) {
         return res.json({
           type: 'wrongCredentials',
-          ok: false
+          ok: false,
+          user
+        });
+      }
+
+      // Account Not Confirmed
+      if (!user.isConfirmed) {
+        return res.json({
+          type: 'notConfirmed',
+          ok: false,
+          user
         });
       }
 

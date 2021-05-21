@@ -21,6 +21,7 @@ class UserRoutes {
         this.router.get('/:id', [authentication_1.AUTH.verifyToken], userCtrl_1.default.getOne);
         this.router.put('/:id', [authentication_1.AUTH.verifyToken], userCtrl_1.default.update);
         this.router.put('/user-data/:id', [authentication_1.AUTH.verifyToken], userCtrl_1.default.updateUserData);
+        this.router.put('/confirm-account', userCtrl_1.default.confirmAccount);
         this.router.put('/image/:id', [authentication_1.AUTH.verifyToken, authentication_1.AUTH.verifyAdminSameUser], userCtrl_1.default.updateImage);
         this.router.put('/change-pass/:id', [authentication_1.AUTH.verifyToken, authentication_1.AUTH.verifyAdminAssociated], userCtrl_1.default.updatePass);
         this.router.put('/change-pass-directly/:id', userCtrl_1.default.updatePassDirectly);

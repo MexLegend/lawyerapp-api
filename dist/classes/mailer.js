@@ -16,7 +16,7 @@ const { google } = require('googleapis');
 const CLIENT_ID = '783095484543-0m8et20nutqgpn6gv5ohhhjjt1vc9dvm.apps.googleusercontent.com';
 const CLIENT_SECRET = 'yUJ6ewqa6NV6dh3Ao1ZircGR';
 const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
-const REFRESH_TOKEN = '1//04XCTNb-a1aKbCgYIARAAGAQSNwF-L9IrATGLa73npJSGQfkOLJCzT-MdidLIz9HmsBGF0gjHz6mwsMeeNHRrFGYza1Gi-6ddneY';
+const REFRESH_TOKEN = '1//04Zn-bs5obBK8CgYIARAAGAQSNwF-L9Irxa-tDT0-ggbAc3TYFjh7aFpBNP28g8Ujx30CiLROZRvk36igMWAXwk1LnFy8YqTQF40';
 const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
 oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 const accessToken = () => __awaiter(void 0, void 0, void 0, function* () { return yield oAuth2Client.getAccessToken(); });
@@ -42,7 +42,6 @@ exports.generateMessageContent = (action, data) => {
     <tbody>
       <tr>
         <td
-          class="x_wrapper-cell"
           align="left"
           bgcolor="#fff"
           style="
@@ -55,9 +54,6 @@ exports.generateMessageContent = (action, data) => {
         >
           <table
             border="0"
-            cellpadding="0"
-            cellspacing="0"
-            class="x_content"
             style="
               width: 100%;
               border-collapse: separate;
@@ -66,7 +62,7 @@ exports.generateMessageContent = (action, data) => {
           >
             <tbody>
               <!-- Header Text -->
-              <tr class="x_alert">
+              <tr>
                 <td
                   align="center"
                   bgcolor="#2e89ff"
@@ -83,9 +79,6 @@ exports.generateMessageContent = (action, data) => {
                 >
                   <table
                     border="0"
-                    cellpadding="0"
-                    cellspacing="0"
-                    class="x_img"
                     style="border-collapse: collapse; margin: 0 auto"
                   >
                     <tbody>
@@ -111,7 +104,7 @@ exports.generateMessageContent = (action, data) => {
                 </td>
               </tr>
               <!-- Spacer -->
-              <tr class="x_spacer">
+              <tr>
                 <td
                   style="
                     font-family: 'Helvetica Neue', Helvetica, Arial,
@@ -125,7 +118,7 @@ exports.generateMessageContent = (action, data) => {
                 </td>
               </tr>
               <!-- Text Paragraph -->
-              <tr class="x_section">
+              <tr>
                 <td
                   align="center"
                   style="
@@ -138,9 +131,6 @@ exports.generateMessageContent = (action, data) => {
                 >
                   <table
                     border="0"
-                    cellpadding="0"
-                    cellspacing="0"
-                    class="x_img"
                     style="border-collapse: collapse; width: 100%"
                   >
                     <tbody>
@@ -175,7 +165,7 @@ exports.generateMessageContent = (action, data) => {
                 </td>
               </tr>
               <!-- User Details Table  -->
-              <tr class="x_section">
+              <tr>
                 <td
                   style="
                     font-family: 'Helvetica Neue', Helvetica, Arial,
@@ -188,9 +178,6 @@ exports.generateMessageContent = (action, data) => {
                 >
                   <table
                     border="0"
-                    cellpadding="0"
-                    cellspacing="0"
-                    class="x_info"
                     style="width: 100%"
                   >
                     <tbody>
@@ -291,7 +278,6 @@ exports.generateMessageContent = (action, data) => {
                           "
                         >
                           <span
-                            class="x_muted"
                             style="
                               color: #333333;
                               text-decoration: none;
@@ -352,7 +338,10 @@ exports.generateMessageContent = (action, data) => {
     }
     else {
         const SECRET = process.env.SECRET;
-        const token = jsonwebtoken_1.sign(Object.assign(Object.assign({}, data), { action }), SECRET, {
+        const token = jsonwebtoken_1.sign({
+            id: data.id,
+            action
+        }, SECRET, {
             expiresIn: process.env.CONFIRM_EMAIL_EXPIRATION
         });
         const emailData = () => {
@@ -394,7 +383,6 @@ exports.generateMessageContent = (action, data) => {
     <tbody>
       <tr>
         <td
-          class="x_wrapper-cell"
           align="left"
           bgcolor="#ffffff"
           style="
@@ -407,15 +395,11 @@ exports.generateMessageContent = (action, data) => {
         >
           <table
             border="0"
-            cellpadding="0"
-            cellspacing="0"
-            class="x_content"
             style="width: 100%; border-collapse: separate; border-spacing: 0"
           >
             <tbody>
               <tr>
                 <td
-                  class="x_text-content"
                   align="center"
                   style="
                     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;

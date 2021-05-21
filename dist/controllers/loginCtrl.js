@@ -28,14 +28,24 @@ exports.default = {
                 if (!user) {
                     return res.json({
                         type: 'notExist',
-                        ok: false
+                        ok: false,
+                        user
                     });
                 }
                 // Wrong Credentials
                 if (!bcryptjs_1.compareSync(userData.password, user.password)) {
                     return res.json({
                         type: 'wrongCredentials',
-                        ok: false
+                        ok: false,
+                        user
+                    });
+                }
+                // Account Not Confirmed
+                if (!user.isConfirmed) {
+                    return res.json({
+                        type: 'notConfirmed',
+                        ok: false,
+                        user
                     });
                 }
                 const SECRET = process.env.SECRET;

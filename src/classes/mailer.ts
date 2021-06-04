@@ -2,39 +2,19 @@ import { sign } from 'jsonwebtoken';
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
 
-const CLIENT_ID =
-  '783095484543-0m8et20nutqgpn6gv5ohhhjjt1vc9dvm.apps.googleusercontent.com';
-const CLIENT_SECRET = 'yUJ6ewqa6NV6dh3Ao1ZircGR';
-const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
-const REFRESH_TOKEN =
-  '1//04Zn-bs5obBK8CgYIARAAGAQSNwF-L9Irxa-tDT0-ggbAc3TYFjh7aFpBNP28g8Ujx30CiLROZRvk36igMWAXwk1LnFy8YqTQF40';
+const {
+  MAILING_SERVICE_CLIENT_ID,
+  MAILING_SERVICE_CLIENT_SECRET,
+  MAILING_SERVICE_REDIRECT_URI,
+  MAILING_SERVICE_REFRESH_TOKEN,
+  SENDER_EMAIL_ADDRESS
+} = process.env;
 
 const oAuth2Client = new google.auth.OAuth2(
-  CLIENT_ID,
-  CLIENT_SECRET,
-  REDIRECT_URI
+  MAILING_SERVICE_CLIENT_ID,
+  MAILING_SERVICE_CLIENT_SECRET,
+  MAILING_SERVICE_REDIRECT_URI
 );
-oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
-
-const accessToken = async () => await oAuth2Client.getAccessToken();
-
-// create reusable transporter object using the default SMTP transport
-export const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    type: 'OAuth2', //Authentication type
-    user: 'armandolarae97@gmail.com', //For example, xyz@gmail.com
-    // pass: 'wrvstyqevfigaiyh',
-    clientId: CLIENT_ID,
-    clientSecret: CLIENT_SECRET,
-    refreshToken: REFRESH_TOKEN,
-    accessToken: accessToken()
-  }
-});
-
-transporter.verify().then(() => {
-  console.log('Ready for send emails');
-});
 
 export const generateMessageContent = (action: string, data: any) => {
   if (action === 'caseEvaluation' || action === 'lawyerContact') {
@@ -156,9 +136,11 @@ export const generateMessageContent = (action: string, data: any) => {
                             <strong>${data.lawyerName.toUpperCase()}</strong>
                           </p>
                           <p>
-                            Se ha registrado una nueva solicitud de
-                            evaluación de un caso. Los datos del
-                            solicitante son:
+                            ${
+                              action === 'caseEvaluation'
+                                ? 'Se ha registrado una nueva solicitud de evaluación de un caso. Los datos del solicitante son:'
+                                : 'Un nuevo usuario ha solicitado ponerse en contacto contigo. Los datos del solicitante son:'
+                            }
                           </p>
                         </td>
                       </tr>
@@ -465,4 +447,33 @@ export const generateMessageContent = (action: string, data: any) => {
     </tbody>
     `;
   }
+};
+
+export const sendEmail = async (mailOptions: any) => {
+  oAuth2Client.setCredentials({ refresh_token: MAILING_SERVICE_REFRESH_TOKEN });
+
+  const accessToken = async () => await oAuth2Client.getAccessToken();
+
+  // create reusable transporter object using the default SMTP transport
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      type: 'OAuth2', //Authentication type
+      user: SENDER_EMAIL_ADDRESS, //For example, xyz@gmail.com
+      // pass: 'wrvstyqevfigaiyh',
+      clientId: MAILING_SERVICE_CLIENT_ID,
+      clientSecret: MAILING_SERVICE_CLIENT_SECRET,
+      refreshToken: MAILING_SERVICE_REFRESH_TOKEN,
+      accessToken: accessToken()
+    }
+  });
+
+  await transporter.sendMail(mailOptions, (err: any, info: any) => {
+    if (err) {
+      console.log('Error en el token');
+    } else {
+      console.log(info);
+    }
+    transporter.close();
+  });
 };

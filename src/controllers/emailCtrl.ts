@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { transporter, generateMessageContent } from '../classes/mailer';
+import { generateMessageContent, sendEmail } from '../classes/mailer';
 import NewsLetter from '../models/newsLetterMdl';
 import User from '../models/userMdl';
 
@@ -213,23 +213,21 @@ class EmailController {
 
       let mailOptions = {
         from: `Haizen Abogados <armandolarae97@gmail.com>`, // sender address
-        to: emailSender, // list of receivers
+        to: emailReceiver ? emailReceiver : emailSender, // list of receivers
         subject: subject, // Subject line
         html: contentHTML
       };
 
-      await transporter.sendMail(mailOptions, function (e: any, r: any) {
-        if (e) {
-          console.log(e);
-        } else {
-          console.log(r);
-        }
-        transporter.close();
-      });
-
-      res
-        .status(201)
-        .json({ ok: true, nameContact, messageContact, emailSender });
+      sendEmail(mailOptions)
+        .then(() => {
+          res
+            .status(201)
+            .json({ ok: true, nameContact, messageContact, emailSender });
+        })
+        .catch((error) => {
+          console.log(error);
+          res.status(500).json({ error, ok: false });
+        });
     } catch (err) {
       res.status(500).json({ err, ok: false });
     }

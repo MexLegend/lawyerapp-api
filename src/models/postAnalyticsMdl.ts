@@ -8,6 +8,7 @@ const postAnalyticsModel = new SchemaM({
       comment: {
         type: String
       },
+      date: { type: Date, default: Date.now },
       user: {
         type: Schema.Types.ObjectId,
         ref: 'User'
@@ -27,6 +28,7 @@ const postAnalyticsModel = new SchemaM({
   },
   reactions: [
     {
+      date: { type: Date, default: Date.now },
       reaction: {
         type: String
       },

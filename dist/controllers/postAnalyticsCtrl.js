@@ -67,6 +67,29 @@ class PostAnalyticsController {
             }
         });
     }
+    // Publish New Comment Into PostAnalytics Collection
+    postComment(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { idPost } = req.params;
+                const { comment, user } = req.body;
+                const postComment = yield postAnalyticsMdl_1.default.findOneAndUpdate({ post: idPost }, {
+                    $push: {
+                        comments: {
+                            comment,
+                            user
+                        }
+                    }
+                }, { new: true })
+                    .populate('comments.user')
+                    .populate('reactions.user');
+                res.status(200).json({ ok: true, postComment });
+            }
+            catch (err) {
+                res.status(500).json({ err, ok: false });
+            }
+        });
+    }
     // Update One or More Rows/Documents From PostAnalytics Collection
     update(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -222,6 +245,8 @@ class PostAnalyticsController {
                     }, {
                         new: true
                     })
+                        .populate('comments.user')
+                        .populate('reactions.user')
                     : yield postAnalyticsMdl_1.default.findOneAndUpdate({ post: idPost, 'reactions.user': idUser }, {
                         $set: {
                             comments,
@@ -232,7 +257,9 @@ class PostAnalyticsController {
                         }
                     }, {
                         new: true
-                    });
+                    })
+                        .populate('comments.user')
+                        .populate('reactions.user');
                 return res.json({
                     updatedPostAnalytics,
                     reactions,

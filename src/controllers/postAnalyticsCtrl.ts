@@ -57,6 +57,33 @@ class PostAnalyticsController {
     }
   }
 
+  // Publish New Comment Into PostAnalytics Collection
+  public async postComment(req: Request, res: Response) {
+    try {
+      const { idPost } = req.params;
+      const { comment, user } = req.body;
+
+      const postComment: any = await PostAnalytics.findOneAndUpdate(
+        { post: idPost },
+        {
+          $push: {
+            comments: {
+              comment,
+              user
+            }
+          }
+        },
+        { new: true }
+      )
+        .populate('comments.user')
+        .populate('reactions.user');
+
+      res.status(200).json({ ok: true, postComment });
+    } catch (err) {
+      res.status(500).json({ err, ok: false });
+    }
+  }
+
   // Update One or More Rows/Documents From PostAnalytics Collection
   public async update(req: any, res: Response) {
     try {
@@ -224,6 +251,8 @@ class PostAnalyticsController {
               new: true
             }
           )
+            .populate('comments.user')
+            .populate('reactions.user')
         : await PostAnalytics.findOneAndUpdate(
             { post: idPost, 'reactions.user': idUser },
             {
@@ -238,7 +267,9 @@ class PostAnalyticsController {
             {
               new: true
             }
-          );
+          )
+            .populate('comments.user')
+            .populate('reactions.user');
 
       return res.json({
         updatedPostAnalytics,

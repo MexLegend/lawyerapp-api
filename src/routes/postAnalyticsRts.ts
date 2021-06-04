@@ -14,6 +14,11 @@ class PostAnalyticsRoutes {
     this.router.get('/', postAnalyticsController.get);
     this.router.get('/:idArray', postAnalyticsController.getOne);
     this.router.put(
+      '/postComment/:idPost',
+      [AUTH.verifyToken],
+      postAnalyticsController.postComment
+    );
+    this.router.put(
       '/update/:idPost',
       [AUTH.verifyToken],
       postAnalyticsController.update

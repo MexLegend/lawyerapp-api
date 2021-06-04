@@ -206,22 +206,20 @@ class EmailController {
       `;
                 let mailOptions = {
                     from: `Haizen Abogados <armandolarae97@gmail.com>`,
-                    to: emailSender,
+                    to: emailReceiver ? emailReceiver : emailSender,
                     subject: subject,
                     html: contentHTML
                 };
-                yield mailer_1.transporter.sendMail(mailOptions, function (e, r) {
-                    if (e) {
-                        console.log(e);
-                    }
-                    else {
-                        console.log(r);
-                    }
-                    mailer_1.transporter.close();
+                mailer_1.sendEmail(mailOptions)
+                    .then(() => {
+                    res
+                        .status(201)
+                        .json({ ok: true, nameContact, messageContact, emailSender });
+                })
+                    .catch((error) => {
+                    console.log(error);
+                    res.status(500).json({ error, ok: false });
                 });
-                res
-                    .status(201)
-                    .json({ ok: true, nameContact, messageContact, emailSender });
             }
             catch (err) {
                 res.status(500).json({ err, ok: false });

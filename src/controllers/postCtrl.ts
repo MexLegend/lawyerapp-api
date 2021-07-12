@@ -80,16 +80,7 @@ class PostController {
   // Get All Rows/Documents From Posts Collection
   public async get(req: Request, res: Response) {
     try {
-      const {
-        filter,
-        filterOpt = 'postTitle',
-        page = 1,
-        perPage = 10,
-        orderField,
-        orderType,
-        status,
-        processState
-      } = req.query;
+      const { page = 1, perPage = 10, status, processState } = req.query;
 
       const options: any = {
         page: parseInt(page, 10),
@@ -107,12 +98,8 @@ class PostController {
         }
       };
 
-      let filtroE = new RegExp(filter, 'i');
       let processStateQuery = processState
         ? [
-            {
-              [filterOpt]: filtroE
-            },
             {
               status
             },
@@ -122,9 +109,6 @@ class PostController {
           ]
         : [
             {
-              [filterOpt]: filtroE
-            },
-            {
               status
             }
           ];
@@ -133,11 +117,7 @@ class PostController {
         $and: processStateQuery
       };
 
-      if (orderField && orderType) {
-        options.sort = {
-          [orderField]: orderType
-        };
-      }
+      console.log(query);
 
       const posts = await Post.paginate(query, options);
 
@@ -153,16 +133,7 @@ class PostController {
   // Get All Rows/Documents Of Lawyer From Posts Collection
   public async getByLawyer(req: Request, res: Response) {
     try {
-      const {
-        filter,
-        filterOpt = 'postTitle',
-        page = 1,
-        perPage = 10,
-        orderField,
-        orderType,
-        status,
-        lawyerId
-      } = req.query;
+      const { page = 1, perPage = 10, status, lawyerId } = req.query;
 
       const options: any = {
         page: parseInt(page, 10),
@@ -180,11 +151,7 @@ class PostController {
         }
       };
 
-      let filtroE = new RegExp(filter, 'i');
       let roleQuery = [
-        {
-          [filterOpt]: filtroE
-        },
         {
           processState: 'PUBLISH'
         },
@@ -200,12 +167,6 @@ class PostController {
         $and: roleQuery
       };
 
-      if (orderField && orderType) {
-        options.sort = {
-          [orderField]: orderType
-        };
-      }
-
       const posts = await Post.paginate(query, options);
 
       return res.status(200).json({
@@ -220,16 +181,7 @@ class PostController {
   // Get All Rows/Documents From Posts Collection With Rol Condition
   public async getByRol(req: Request, res: Response) {
     try {
-      const {
-        filter,
-        filterOpt = 'postTitle',
-        page = 1,
-        perPage = 10,
-        orderField,
-        orderType,
-        status,
-        user
-      } = req.query;
+      const { page = 1, perPage = 10, status, user } = req.query;
 
       const parsedUserData = JSON.parse(user);
 
@@ -249,21 +201,14 @@ class PostController {
         }
       };
 
-      let filtroE = new RegExp(filter, 'i');
       let roleQuery =
         parsedUserData.role === 'ADMIN'
           ? [
-              {
-                [filterOpt]: filtroE
-              },
               {
                 status
               }
             ]
           : [
-              {
-                [filterOpt]: filtroE
-              },
               {
                 status
               },
@@ -275,12 +220,6 @@ class PostController {
       const query = {
         $and: roleQuery
       };
-
-      if (orderField && orderType) {
-        options.sort = {
-          [orderField]: orderType
-        };
-      }
 
       const posts = await Post.paginate(query, options);
 

@@ -157,14 +157,7 @@ class EvidenceController {
   // Get All Rows/Documents From Evidences Collection
   public async get(req: any, res: Response) {
     try {
-      const {
-        filter,
-        filterOpt = '',
-        page = 1,
-        perPage = 10,
-        orderField,
-        orderType
-      } = req.query;
+      const { page = 1, perPage = 10 } = req.query;
       const { idCase } = req.params;
 
       const options: any = {
@@ -180,18 +173,10 @@ class EvidenceController {
         }
       };
 
-      let filtroE = new RegExp(filter, 'i');
-
       const query = {
         case: idCase,
         status: { $ne: 'DELETED' }
       };
-
-      if (orderField && orderType) {
-        options.sort = {
-          [orderField]: orderType
-        };
-      }
 
       const evidences = await Evidence.paginate(query, options);
 

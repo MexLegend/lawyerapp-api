@@ -4,11 +4,8 @@ const Schema = mongoose.Schema;
 
 const rateModel = new Schema({
   comment: {
-    comment: { type: String, default: '' },
-    created_at: {
-      type: Date,
-      default: Date.now
-    },
+    type: String,
+    default: '',
     required: false
   },
   externalModelType: {
@@ -24,6 +21,10 @@ const rateModel = new Schema({
   user_id: {
     type: Schema.Types.ObjectId,
     ref: 'User'
+  },
+  created_at: {
+    type: Date,
+    default: Date.now
   }
 });
 

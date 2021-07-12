@@ -146,7 +146,7 @@ class EvidenceController {
     get(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { filter, filterOpt = '', page = 1, perPage = 10, orderField, orderType } = req.query;
+                const { page = 1, perPage = 10 } = req.query;
                 const { idCase } = req.params;
                 const options = {
                     page: parseInt(page, 10),
@@ -160,16 +160,10 @@ class EvidenceController {
                         date: 1
                     }
                 };
-                let filtroE = new RegExp(filter, 'i');
                 const query = {
                     case: idCase,
                     status: { $ne: 'DELETED' }
                 };
-                if (orderField && orderType) {
-                    options.sort = {
-                        [orderField]: orderType
-                    };
-                }
                 const evidences = yield evidenceMdl_1.default.paginate(query, options);
                 return res.status(200).json({
                     evidences,

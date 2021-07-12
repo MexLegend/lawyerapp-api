@@ -118,7 +118,7 @@ class UtilitiesController {
 
       const rateData = {
         rating: rate,
-        ...(rateComment && { comment: { comment: rateComment } }),
+        ...(rateComment && { comment: rateComment }),
         externalModelType: dataType,
         data_id: id,
         user_id
@@ -154,7 +154,7 @@ class UtilitiesController {
 
       const rateData = {
         rating: rate,
-        ...(rateComment && { comment: { comment: rateComment } })
+        ...(rateComment && { comment: rateComment })
       };
 
       // Update Rating Row From Rate Collection

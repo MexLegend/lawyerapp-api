@@ -154,15 +154,8 @@ class UserController {
   // Get All Rows/Documents From Users Collection
   public async get(req: any, res: Response) {
     try {
-      const {
-        filter,
-        filterOpt = 'firstName',
-        page = 1,
-        perPage = 10,
-        orderField,
-        orderType,
-        status
-      } = req.query;
+      const { page = 1, perPage = 10, status } = req.query;
+
       const options: any = {
         page: parseInt(page, 10),
         limit: parseInt(perPage, 10),
@@ -171,10 +164,7 @@ class UserController {
         }
       };
 
-      let filtroE = new RegExp(filter, 'i');
-
       const query = {
-        [filterOpt]: filtroE,
         status,
         $or:
           req.user.role === 'ADMIN'
@@ -191,12 +181,6 @@ class UserController {
               ]
       };
 
-      if (orderField && orderType) {
-        options.sort = {
-          [orderField]: orderType
-        };
-      }
-
       const users = await User.paginate(query, options);
 
       return res.status(200).json({
@@ -211,31 +195,211 @@ class UserController {
   // Get Lawyer From Users Collection
   public async getLawyer(req: Request, res: Response) {
     try {
-      const lawyer: any = await User.findOne({ _id: req.params.id }).populate(
-        'practice_areas.practice_area'
-      );
-
-      const ratingData: any = req.params.getRatingData
-        ? await Rate.aggregate([
-            { $match: { data_id: lawyer._id } },
-            {
-              $group: {
-                _id: '$data_id',
-                ratingAvg: { $avg: '$rating' },
-                ratingCount: { $sum: 1 },
-                comments: {
-                  $addToSet: { user_id: '$user_id', comment: '$comment' }
+      const lawyer: any = await User.aggregate([
+        // Lookup Practice Areas
+        {
+          $lookup: {
+            from: 'practiceareas',
+            localField: 'practice_areas.practice_area',
+            foreignField: '_id',
+            as: 'practice_areas'
+          }
+        },
+        // Lookup Rates
+        {
+          $lookup: {
+            from: 'rates',
+            let: { idRating: Types.ObjectId(req.params.id) },
+            pipeline: [
+              // Match Rate Queries With Data Id
+              {
+                $match: {
+                  $expr: {
+                    $and: [{ $eq: ['$data_id', '$$idRating'] }]
+                  }
+                }
+              },
+              // Get Rating Data
+              {
+                $group: {
+                  _id: '$$idRating',
+                  ratingAvg: { $avg: '$rating' },
+                  ratingCount: { $sum: 1 },
+                  fiveStarsCount: {
+                    $sum: {
+                      $cond: [
+                        {
+                          $or: [
+                            { $eq: ['$rating', 5] },
+                            { $eq: ['$rating', 4.5] }
+                          ]
+                        },
+                        1,
+                        0
+                      ]
+                    }
+                  },
+                  fourStarsCount: {
+                    $sum: {
+                      $cond: [
+                        {
+                          $or: [
+                            { $eq: ['$rating', 4] },
+                            { $eq: ['$rating', 3.5] }
+                          ]
+                        },
+                        1,
+                        0
+                      ]
+                    }
+                  },
+                  threeStarsCount: {
+                    $sum: {
+                      $cond: [
+                        {
+                          $or: [
+                            { $eq: ['$rating', 3] },
+                            { $eq: ['$rating', 2.5] }
+                          ]
+                        },
+                        1,
+                        0
+                      ]
+                    }
+                  },
+                  twoStarsCount: {
+                    $sum: {
+                      $cond: [
+                        {
+                          $or: [
+                            { $eq: ['$rating', 2] },
+                            { $eq: ['$rating', 1.5] }
+                          ]
+                        },
+                        1,
+                        0
+                      ]
+                    }
+                  },
+                  oneStarCount: {
+                    $sum: {
+                      $cond: [
+                        {
+                          $eq: ['$rating', 1]
+                        },
+                        1,
+                        0
+                      ]
+                    }
+                  },
+                  comments: {
+                    $addToSet: {
+                      user: '$user_id',
+                      ratingValue: '$rating',
+                      comment: '$comment',
+                      date: '$created_at'
+                    }
+                  }
+                }
+              },
+              // Lookup Users That Commented
+              {
+                $lookup: {
+                  from: 'users',
+                  let: { usersId: '$comments' },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: {
+                          $in: ['$_id', '$$usersId.user']
+                        }
+                      }
+                    },
+                    {
+                      $project: {
+                        _id: '$_id',
+                        img: '$img',
+                        firstName: '$firstName',
+                        lastName: '$lastName'
+                      }
+                    }
+                  ],
+                  as: 'usersComment'
+                }
+              },
+              // Project Data To Get Desired Result
+              {
+                $project: {
+                  ratingAvg: '$ratingAvg',
+                  ratingCount: '$ratingCount',
+                  fiveStarsAvg: {
+                    $multiply: [
+                      { $divide: ['$fiveStarsCount', '$ratingCount'] },
+                      100
+                    ]
+                  },
+                  fourStarsAvg: {
+                    $multiply: [
+                      { $divide: ['$fourStarsCount', '$ratingCount'] },
+                      100
+                    ]
+                  },
+                  threeStarsAvg: {
+                    $multiply: [
+                      { $divide: ['$threeStarsCount', '$ratingCount'] },
+                      100
+                    ]
+                  },
+                  twoStarsAvg: {
+                    $multiply: [
+                      { $divide: ['$twoStarsCount', '$ratingCount'] },
+                      100
+                    ]
+                  },
+                  oneStarAvg: {
+                    $multiply: [
+                      { $divide: ['$oneStarCount', '$ratingCount'] },
+                      100
+                    ]
+                  },
+                  comments: {
+                    $map: {
+                      input: '$comments',
+                      in: {
+                        $mergeObjects: [
+                          '$$this',
+                          {
+                            $arrayElemAt: [
+                              '$usersComment',
+                              {
+                                $indexOfArray: [
+                                  '$usersComment._id',
+                                  '$$this.user'
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  }
                 }
               }
-            }
-          ])
-        : null;
+            ],
+            as: 'ratingData'
+          }
+        },
+        {
+          $unwind: {
+            path: '$ratingData',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        { $match: { _id: Types.ObjectId(req.params.id) } }
+      ]);
 
       return res.status(200).json({
-        lawyer: {
-          ...lawyer._doc,
-          ratingData: ratingData ? ratingData[0] : ratingData
-        },
+        lawyer: lawyer[0],
         ok: true
       });
     } catch (err) {
@@ -246,16 +410,50 @@ class UserController {
   // Get All Rows/Documents From Users Collection With Rol Condition
   public async getLawyers(req: Request, res: Response) {
     try {
-      const lawyers: any = await User.find({
-        $or: [
-          {
-            role: { $in: ['ADMIN', 'ASSOCIATED'] }
+      const lawyers = await User.aggregate([
+        {
+          $match: {
+            $or: [
+              {
+                role: { $in: ['ADMIN', 'ASSOCIATED'] }
+              }
+            ]
           }
-        ]
-      }).sort({ firstName: 1 });
+        },
+        {
+          $lookup: {
+            from: 'rates',
+            let: { idRating: '$_id' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [{ $eq: ['$data_id', '$$idRating'] }]
+                  }
+                }
+              },
+              {
+                $group: {
+                  _id: '$_id',
+                  ratingAvg: { $avg: '$rating' },
+                  ratingCount: { $sum: 1 },
+                  comments: {
+                    $addToSet: {
+                      user_id: '$user_id',
+                      comment: '$comment',
+                      date: '$created_at'
+                    }
+                  }
+                }
+              }
+            ],
+            as: 'ratingData'
+          }
+        }
+      ]).sort({ firstName: 1 });
 
       return res.status(200).json({
-        lawyers: lawyers,
+        lawyers,
         ok: true
       });
     } catch (err) {

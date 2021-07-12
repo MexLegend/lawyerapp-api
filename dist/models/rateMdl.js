@@ -7,11 +7,8 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const Schema = mongoose_1.default.Schema;
 const rateModel = new Schema({
     comment: {
-        comment: { type: String, default: '' },
-        created_at: {
-            type: Date,
-            default: Date.now
-        },
+        type: String,
+        default: '',
         required: false
     },
     externalModelType: {
@@ -27,6 +24,10 @@ const rateModel = new Schema({
     user_id: {
         type: Schema.Types.ObjectId,
         ref: 'User'
+    },
+    created_at: {
+        type: Date,
+        default: Date.now
     }
 });
 exports.default = mongoose_1.default.model('Rate', rateModel);

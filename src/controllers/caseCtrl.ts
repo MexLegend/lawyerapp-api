@@ -102,15 +102,8 @@ class CaseController {
   // Get All Rows/Documents From Cases Collection With Condition
   public async get(req: any, res: Response) {
     try {
-      const {
-        filter,
-        filterOpt = 'affair',
-        page = 1,
-        perPage = 10,
-        orderField,
-        orderType,
-        status
-      } = req.query;
+      const { page = 1, perPage = 10, status } = req.query;
+
       const options: any = {
         page: parseInt(page, 10),
         limit: parseInt(perPage, 10),
@@ -124,10 +117,7 @@ class CaseController {
         }
       };
 
-      let filtroE = new RegExp(filter, 'i');
-
       const query = {
-        [filterOpt]: filtroE,
         status: { $ne: 'DELETED' },
         $or: [
           {
@@ -138,12 +128,6 @@ class CaseController {
           }
         ]
       };
-
-      if (orderField && orderType) {
-        options.sort = {
-          [orderField]: orderType
-        };
-      }
 
       const cases = await Case.paginate(query, options);
 

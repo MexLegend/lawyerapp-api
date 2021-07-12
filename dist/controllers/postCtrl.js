@@ -82,7 +82,7 @@ class PostController {
     get(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { filter, filterOpt = 'postTitle', page = 1, perPage = 10, orderField, orderType, status, processState } = req.query;
+                const { page = 1, perPage = 10, status, processState } = req.query;
                 const options = {
                     page: parseInt(page, 10),
                     limit: parseInt(perPage, 10),
@@ -98,12 +98,8 @@ class PostController {
                         created_at: -1
                     }
                 };
-                let filtroE = new RegExp(filter, 'i');
                 let processStateQuery = processState
                     ? [
-                        {
-                            [filterOpt]: filtroE
-                        },
                         {
                             status
                         },
@@ -113,20 +109,13 @@ class PostController {
                     ]
                     : [
                         {
-                            [filterOpt]: filtroE
-                        },
-                        {
                             status
                         }
                     ];
                 const query = {
                     $and: processStateQuery
                 };
-                if (orderField && orderType) {
-                    options.sort = {
-                        [orderField]: orderType
-                    };
-                }
+                console.log(query);
                 const posts = yield postMdl_1.default.paginate(query, options);
                 return res.status(200).json({
                     posts,
@@ -142,7 +131,7 @@ class PostController {
     getByLawyer(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { filter, filterOpt = 'postTitle', page = 1, perPage = 10, orderField, orderType, status, lawyerId } = req.query;
+                const { page = 1, perPage = 10, status, lawyerId } = req.query;
                 const options = {
                     page: parseInt(page, 10),
                     limit: parseInt(perPage, 10),
@@ -158,11 +147,7 @@ class PostController {
                         created_at: -1
                     }
                 };
-                let filtroE = new RegExp(filter, 'i');
                 let roleQuery = [
-                    {
-                        [filterOpt]: filtroE
-                    },
                     {
                         processState: 'PUBLISH'
                     },
@@ -176,11 +161,6 @@ class PostController {
                 const query = {
                     $and: roleQuery
                 };
-                if (orderField && orderType) {
-                    options.sort = {
-                        [orderField]: orderType
-                    };
-                }
                 const posts = yield postMdl_1.default.paginate(query, options);
                 return res.status(200).json({
                     posts,
@@ -196,7 +176,7 @@ class PostController {
     getByRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { filter, filterOpt = 'postTitle', page = 1, perPage = 10, orderField, orderType, status, user } = req.query;
+                const { page = 1, perPage = 10, status, user } = req.query;
                 const parsedUserData = JSON.parse(user);
                 const options = {
                     page: parseInt(page, 10),
@@ -213,20 +193,13 @@ class PostController {
                         created_at: -1
                     }
                 };
-                let filtroE = new RegExp(filter, 'i');
                 let roleQuery = parsedUserData.role === 'ADMIN'
                     ? [
-                        {
-                            [filterOpt]: filtroE
-                        },
                         {
                             status
                         }
                     ]
                     : [
-                        {
-                            [filterOpt]: filtroE
-                        },
                         {
                             status
                         },
@@ -237,11 +210,6 @@ class PostController {
                 const query = {
                     $and: roleQuery
                 };
-                if (orderField && orderType) {
-                    options.sort = {
-                        [orderField]: orderType
-                    };
-                }
                 const posts = yield postMdl_1.default.paginate(query, options);
                 return res.status(200).json({
                     posts,

@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const practiceArea_Mdl_1 = __importDefault(require("../models/practiceArea.Mdl"));
 const userMdl_1 = __importDefault(require("../models/userMdl"));
+const mongoose_1 = require("mongoose");
 class PracticeAreaController {
     // Insert a New Row/Document Into The Practice Areas Collection
     create(req, res) {
@@ -140,7 +141,7 @@ class PracticeAreaController {
     get(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { page = 1, perPage = 10, orderField, orderType, status, processState, is_category } = req.query;
+                const { page = 1, perPage = 10, status, processState, is_category } = req.query;
                 const options = {
                     page: parseInt(page, 10),
                     limit: parseInt(perPage, 10),
@@ -172,11 +173,6 @@ class PracticeAreaController {
                 const query = {
                     $and: processStateQuery
                 };
-                if (orderField && orderType) {
-                    options.sort = {
-                        [orderField]: orderType
-                    };
-                }
                 const practiceAreas = yield practiceArea_Mdl_1.default.paginate(query, options);
                 return res.status(200).json({
                     practiceAreas: practiceAreas.docs,
@@ -206,11 +202,39 @@ class PracticeAreaController {
     getSpecializedLawyers(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const specializedLawyers = yield userMdl_1.default.find({
-                    practice_areas: {
-                        $elemMatch: { practice_area: req.params.idPracticeArea }
+                const specializedLawyers = yield userMdl_1.default.aggregate([
+                    {
+                        $match: {
+                            practice_areas: {
+                                $elemMatch: {
+                                    practice_area: mongoose_1.Types.ObjectId(req.params.idPracticeArea)
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: 'rates',
+                            let: { idRating: '$_id' },
+                            pipeline: [
+                                {
+                                    $match: {
+                                        $expr: {
+                                            $eq: ['$data_id', '$$idRating']
+                                        }
+                                    }
+                                },
+                                {
+                                    $group: {
+                                        _id: '$_id',
+                                        ratingAvg: { $avg: '$rating' }
+                                    }
+                                }
+                            ],
+                            as: 'ratingData'
+                        }
                     }
-                });
+                ]).sort({ firstName: 1 });
                 res.status(200).json({ ok: true, specializedLawyers });
             }
             catch (err) {

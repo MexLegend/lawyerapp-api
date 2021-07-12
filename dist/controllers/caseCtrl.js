@@ -94,7 +94,7 @@ class CaseController {
     get(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { filter, filterOpt = 'affair', page = 1, perPage = 10, orderField, orderType, status } = req.query;
+                const { page = 1, perPage = 10, status } = req.query;
                 const options = {
                     page: parseInt(page, 10),
                     limit: parseInt(perPage, 10),
@@ -107,9 +107,7 @@ class CaseController {
                         affair: 1
                     }
                 };
-                let filtroE = new RegExp(filter, 'i');
                 const query = {
-                    [filterOpt]: filtroE,
                     status: { $ne: 'DELETED' },
                     $or: [
                         {
@@ -120,11 +118,6 @@ class CaseController {
                         }
                     ]
                 };
-                if (orderField && orderType) {
-                    options.sort = {
-                        [orderField]: orderType
-                    };
-                }
                 const cases = yield caseMdl_1.default.paginate(query, options);
                 return res.status(200).json({
                     cases,

@@ -119,7 +119,7 @@ class UtilitiesController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id, user_id, rate, rateComment = null, dataType } = req.body;
-                const rateData = Object.assign(Object.assign({ rating: rate }, (rateComment && { comment: { comment: rateComment } })), { externalModelType: dataType, data_id: id, user_id });
+                const rateData = Object.assign(Object.assign({ rating: rate }, (rateComment && { comment: rateComment })), { externalModelType: dataType, data_id: id, user_id });
                 // Insert New Row Into Rate Collection
                 const rateResponse = yield rateMdl_1.default.create(rateData);
                 // Insert Rating Field Into Respective User Collection
@@ -144,7 +144,7 @@ class UtilitiesController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id, rate, rateComment = null } = req.body;
-                const rateData = Object.assign({ rating: rate }, (rateComment && { comment: { comment: rateComment } }));
+                const rateData = Object.assign({ rating: rate }, (rateComment && { comment: rateComment }));
                 // Update Rating Row From Rate Collection
                 const rateResponse = yield rateMdl_1.default.findByIdAndUpdate({ _id: id }, rateData, {
                     new: true

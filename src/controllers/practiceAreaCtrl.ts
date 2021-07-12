@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 
-import Post from '../models/postMdl';
 import PracticeArea from '../models/practiceArea.Mdl';
 import User from '../models/userMdl';
+import { Types } from 'mongoose';
 
 class PracticeAreaController {
   // Insert a New Row/Document Into The Practice Areas Collection
@@ -153,8 +153,6 @@ class PracticeAreaController {
       const {
         page = 1,
         perPage = 10,
-        orderField,
-        orderType,
         status,
         processState,
         is_category
@@ -195,12 +193,6 @@ class PracticeAreaController {
         $and: processStateQuery
       };
 
-      if (orderField && orderType) {
-        options.sort = {
-          [orderField]: orderType
-        };
-      }
-
       const practiceAreas = await PracticeArea.paginate(query, options);
 
       return res.status(200).json({
@@ -227,11 +219,40 @@ class PracticeAreaController {
   // Get All Rows/Documents From Users Collection Where Parctice Area Matches
   public async getSpecializedLawyers(req: Request, res: Response) {
     try {
-      const specializedLawyers = await User.find({
-        practice_areas: {
-          $elemMatch: { practice_area: req.params.idPracticeArea }
+      const specializedLawyers = await User.aggregate([
+        {
+          $match: {
+            practice_areas: {
+              $elemMatch: {
+                practice_area: Types.ObjectId(req.params.idPracticeArea)
+              }
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'rates',
+            let: { idRating: '$_id' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: ['$data_id', '$$idRating']
+                  }
+                }
+              },
+              {
+                $group: {
+                  _id: '$_id',
+                  ratingAvg: { $avg: '$rating' }
+                }
+              }
+            ],
+            as: 'ratingData'
+          }
         }
-      });
+      ]).sort({ firstName: 1 });
+
       res.status(200).json({ ok: true, specializedLawyers });
     } catch (err) {
       res.status(500).json({ err, ok: false });

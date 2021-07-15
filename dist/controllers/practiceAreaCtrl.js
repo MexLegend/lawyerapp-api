@@ -226,7 +226,7 @@ class PracticeAreaController {
                                 },
                                 {
                                     $group: {
-                                        _id: '$_id',
+                                        _id: '$$idRating',
                                         ratingAvg: { $avg: '$rating' }
                                     }
                                 }

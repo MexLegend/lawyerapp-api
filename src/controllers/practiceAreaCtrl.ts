@@ -294,6 +294,8 @@ class PracticeAreaController {
         );
       }
 
+      console.log(practiceAreaData);
+
       const practiceArea: any = await PracticeArea.findByIdAndUpdate(
         { _id: idPracticeArea },
         practiceAreaData,

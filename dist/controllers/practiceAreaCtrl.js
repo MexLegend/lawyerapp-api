@@ -266,6 +266,7 @@ class PracticeAreaController {
                         }
                     });
                 }
+                console.log(practiceAreaData);
                 const practiceArea = yield practiceArea_Mdl_1.default.findByIdAndUpdate({ _id: idPracticeArea }, practiceAreaData, {
                     new: true
                 });

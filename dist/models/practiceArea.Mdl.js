@@ -16,12 +16,6 @@ const practiceAreaModel = new SchemaM({
         type: Date,
         default: Date.now
     },
-    faq: [
-        {
-            answer: { type: String },
-            question: { type: String }
-        }
-    ],
     is_category: {
         type: Boolean,
         default: false
